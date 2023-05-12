@@ -28,5 +28,6 @@ source bin/activate
 
 pip3 install wheel && pip3 install --upgrade setuptools && pip3 install --upgrade pip
 pip3 install numpy scipy mpmath sympy matplotlib pynverse composite-ufjc-scission
+pip3 install mpi4py
 
 deactivate
