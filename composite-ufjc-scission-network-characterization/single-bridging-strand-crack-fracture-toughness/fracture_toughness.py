@@ -63,17 +63,41 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
             "pva": "c-c"
         }
 
-        p.characterizer.LT_label = r'$u\textrm{FJC L\&T}$'
-        p.characterizer.LT_inext_gaussian_label = (
-            r'$\textrm{IGC L\&T}$'
+        p.characterizer.cufjc_A_nu_linestyle = '-'
+        p.characterizer.inext_gaussian_A_nu_linestyle = '--'
+
+        p.characterizer.LT_full_zeta_nu_char_label = (
+            r'$\textrm{LT}~(\hat{\varepsilon}_{c\nu}^{sci})^{crit} = \zeta_{\nu}^{char}$'
         )
-        p.characterizer.ufjc_label = r'$\textrm{c}u\textrm{FJC}$'
+        p.characterizer.LT_overline_full_zeta_nu_char_label = (
+            r'$\textrm{LT}~\overline{(\hat{\varepsilon}_{c\nu}^{sci})^{crit}} = 1$'
+        )
+        p.characterizer.LT_full_zeta_nu_char_color = 'red'
+        p.characterizer.LT_full_zeta_nu_char_linestyle = '--'
+
+        p.characterizer.LT_quarter_zeta_nu_char_label = (
+            r'$\textrm{LT}~(\hat{\varepsilon}_{c\nu}^{sci})^{crit} = \zeta_{\nu}^{char}/4$'
+        )
+        p.characterizer.LT_overline_quarter_zeta_nu_char_label = (
+            r'$\textrm{LT}~\overline{(\hat{\varepsilon}_{c\nu}^{sci})^{crit}} = 0.25$'
+        )
+        p.characterizer.LT_quarter_zeta_nu_char_color = 'magenta'
+        p.characterizer.LT_quarter_zeta_nu_char_linestyle = '--'
+
+        p.characterizer.cufjc_label = (
+            r'$\textrm{c}u\textrm{FJC scission}~(\hat{\varepsilon}_{c\nu}^{diss})^{crit}$'
+        )
+        p.characterizer.cufjc_overline_label = (
+            r'$\textrm{c}u\textrm{FJC scission}~\overline{(\hat{\varepsilon}_{c\nu}^{diss})^{crit}}$'
+        )
+        p.characterizer.cufjc_color = 'blue'
+        p.characterizer.cufjc_linestyle = '-'
 
         p.characterizer.f_c_num_steps = 100001
         p.characterizer.r_nu_num_steps = 100001
 
-        # nu = 1 -> nu = 10000, only 250 unique nu values exist here
-        nu_list = np.unique(np.rint(np.logspace(0, 4, 51))) # 351 <-> 51
+        # nu = 1 -> nu = 10000, only 151 unique nu values exist here
+        nu_list = np.unique(np.rint(np.logspace(0, 4, 195)))
         nu_num = len(nu_list)
         nu_list_mpi_split = np.array_split(nu_list, self.comm_size)
         nu_num_list_mpi_split = [
@@ -84,18 +108,6 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
         p.characterizer.nu_num = nu_num
         p.characterizer.nu_list_mpi_split = nu_list_mpi_split
         p.characterizer.nu_num_list_mpi_split = nu_num_list_mpi_split
-
-        check_xi_c_dot_list = np.logspace(-40, 0, 101)
-        check_xi_c_dot_num = len(check_xi_c_dot_list)
-        check_xi_c_dot_list_mpi_split = np.array_split(check_xi_c_dot_list, self.comm_size)
-        check_xi_c_dot_num_list_mpi_split = [
-            len(check_xi_c_dot_list_mpi_split[proc_indx])
-            for proc_indx in range(self.comm_size)
-        ]
-        p.characterizer.check_xi_c_dot_list = check_xi_c_dot_list
-        p.characterizer.check_xi_c_dot_num = check_xi_c_dot_num
-        p.characterizer.check_xi_c_dot_list_mpi_split = check_xi_c_dot_list_mpi_split
-        p.characterizer.check_xi_c_dot_num_list_mpi_split = check_xi_c_dot_num_list_mpi_split
 
         # from DFT simulations on H_3C-CH_2-CH_3 (c-c) 
         # and H_3Si-O-CH_3 (si-o) by Beyer, J Chem. Phys., 2000
@@ -110,19 +122,36 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
             for tau_b_indx in range(beyer_2000_tau_b_num)
         ]
         beyer_2000_tau_b_label_list = [
-            r'$\textrm{WPCR},~\tau_{\nu}='+'10^{%g}~sec$' % (beyer_2000_tau_b_exponent_list[tau_b_indx])
+            r'$\textrm{WPRC}~(\hat{\varepsilon}_{c\nu}^{sci})^{crit},~\tau_{\nu}='+'10^{%g}~sec$' % (beyer_2000_tau_b_exponent_list[tau_b_indx])
             for tau_b_indx in range(beyer_2000_tau_b_num)
         ]
-        beyer_2000_tau_b_color_list = ['darkturquoise', 'deepskyblue', 'dodgerblue', 'cornflowerblue', 'royalblue']
+        beyer_2000_tau_b_overline_label_list = [
+            r'$\textrm{WPRC}~\overline{(\hat{\varepsilon}_{c\nu}^{sci})^{crit}},~\tau_{\nu}='+'10^{%g}~sec$' % (beyer_2000_tau_b_exponent_list[tau_b_indx])
+            for tau_b_indx in range(beyer_2000_tau_b_num)
+        ]
+        beyer_2000_tau_b_color_list = ['gainsboro', 'lightgrey', 'silver', 'darkgrey', 'grey']
         beyer_2000_tau_b_linestyle_list = ['--', '--', '--', '--', '--']
 
-        p.characterizer.chain_backbone_bond_type2beyer_2000_f_c_max_tau_b_dict = chain_backbone_bond_type2beyer_2000_f_c_max_tau_b_dict
+        p.characterizer.chain_backbone_bond_type2beyer_2000_f_c_max_tau_b_dict = (
+            chain_backbone_bond_type2beyer_2000_f_c_max_tau_b_dict
+        )
         p.characterizer.beyer_2000_tau_b_list = beyer_2000_tau_b_list
         p.characterizer.beyer_2000_tau_b_num = beyer_2000_tau_b_num
-        p.characterizer.beyer_2000_tau_b_exponent_list = beyer_2000_tau_b_exponent_list
-        p.characterizer.beyer_2000_tau_b_label_list = beyer_2000_tau_b_label_list
-        p.characterizer.beyer_2000_tau_b_color_list = beyer_2000_tau_b_color_list
-        p.characterizer.beyer_2000_tau_b_linestyle_list = beyer_2000_tau_b_linestyle_list
+        p.characterizer.beyer_2000_tau_b_exponent_list = (
+            beyer_2000_tau_b_exponent_list
+        )
+        p.characterizer.beyer_2000_tau_b_label_list = (
+            beyer_2000_tau_b_label_list
+        )
+        p.characterizer.beyer_2000_tau_b_overline_label_list = (
+            beyer_2000_tau_b_overline_label_list
+        )
+        p.characterizer.beyer_2000_tau_b_color_list = (
+            beyer_2000_tau_b_color_list
+        )
+        p.characterizer.beyer_2000_tau_b_linestyle_list = (
+            beyer_2000_tau_b_linestyle_list
+        )
 
         p.characterizer.AFM_exprmts_indx_list = [1, 2, 3]
         p.characterizer.typcl_AFM_exprmt_indx = 2
@@ -135,17 +164,53 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
             for f_c_dot_indx in range(f_c_dot_num)
         ]
         f_c_dot_label_list = [
-            r'$\textrm{c}u\textrm{FJC},~\dot{f}_c='+'10^{%g}~nm/sec$' % (f_c_dot_exponent_list[f_c_dot_indx])
+            r'$\textrm{c}u\textrm{FJC scission}~(\hat{\varepsilon}_{c\nu}^{diss})^{crit},~\dot{f}_c='+'10^{%g}~nN/sec$' % (f_c_dot_exponent_list[f_c_dot_indx])
+            for f_c_dot_indx in range(f_c_dot_num)
+        ]
+        f_c_dot_overline_label_list = [
+            r'$\textrm{c}u\textrm{FJC scission}~\overline{(\hat{\varepsilon}_{c\nu}^{diss})^{crit}},~\dot{f}_c='+'10^{%g}~nN/sec$' % (f_c_dot_exponent_list[f_c_dot_indx])
+            for f_c_dot_indx in range(f_c_dot_num)
+        ]
+        f_c_dot_comparison_label_list = [
+            r'$\textrm{c}u\textrm{FJC scission},~\dot{f}_c='+'10^{%g}~nN/sec$' % (f_c_dot_exponent_list[f_c_dot_indx])
+            for f_c_dot_indx in range(f_c_dot_num)
+        ]
+        f_c_dot_comparison_overline_label_list = [
+            r'$\textrm{c}u\textrm{FJC scission},~\dot{f}_c='+'10^{%g}~nN/sec$' % (f_c_dot_exponent_list[f_c_dot_indx])
             for f_c_dot_indx in range(f_c_dot_num)
         ]
         f_c_dot_color_list = ['orange', 'purple', 'green']
         f_c_dot_color_list = f_c_dot_color_list[::-1]
+        f_c_dot_linestyle_list = ['-', '-', '-']
+        f_c_dot_linestyle_list = f_c_dot_linestyle_list[::-1]
+        f_c_dot_comparison_color_list = ['orange', 'purple', 'green']
+        f_c_dot_comparison_color_list = f_c_dot_comparison_color_list[::-1]
+        f_c_dot_comparison_linestyle_list = ['-', '-', '-']
+        f_c_dot_comparison_linestyle_list = (
+            f_c_dot_comparison_linestyle_list[::-1]
+        )
 
-        p.characterizer.f_c_dot_list          = f_c_dot_list
-        p.characterizer.f_c_dot_num           = f_c_dot_num
+        p.characterizer.f_c_dot_list = f_c_dot_list
+        p.characterizer.f_c_dot_num = f_c_dot_num
         p.characterizer.f_c_dot_exponent_list = f_c_dot_exponent_list
-        p.characterizer.f_c_dot_label_list    = f_c_dot_label_list
-        p.characterizer.f_c_dot_color_list    = f_c_dot_color_list
+        p.characterizer.f_c_dot_label_list = f_c_dot_label_list
+        p.characterizer.f_c_dot_overline_label_list = (
+            f_c_dot_overline_label_list
+        )
+        p.characterizer.f_c_dot_comparison_label_list = (
+            f_c_dot_comparison_label_list
+        )
+        p.characterizer.f_c_dot_comparison_overline_label_list = (
+            f_c_dot_comparison_overline_label_list
+        )
+        p.characterizer.f_c_dot_color_list = f_c_dot_color_list
+        p.characterizer.f_c_dot_linestyle_list = f_c_dot_linestyle_list
+        p.characterizer.f_c_dot_comparison_color_list = (
+            f_c_dot_comparison_color_list
+        )
+        p.characterizer.f_c_dot_comparison_linestyle_list = (
+            f_c_dot_comparison_linestyle_list
+        )
 
         r_nu_dot_list = [1e1, 1e5, 1e9] # nm/sec
         r_nu_dot_list = r_nu_dot_list[::-1] # reverse order
@@ -155,17 +220,53 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
             for r_nu_dot_indx in range(r_nu_dot_num)
         ]
         r_nu_dot_label_list = [
-            r'$\textrm{c}u\textrm{FJC},~\dot{r}_{\nu}='+'10^{%g}~nm/sec$' % (r_nu_dot_exponent_list[r_nu_dot_indx])
+            r'$\textrm{c}u\textrm{FJC scission}~(\hat{\varepsilon}_{c\nu}^{diss})^{crit},~\dot{r}_{\nu}='+'10^{%g}~nm/sec$' % (r_nu_dot_exponent_list[r_nu_dot_indx])
+            for r_nu_dot_indx in range(r_nu_dot_num)
+        ]
+        r_nu_dot_overline_label_list = [
+            r'$\textrm{c}u\textrm{FJC scission}~\overline{(\hat{\varepsilon}_{c\nu}^{diss})^{crit}},~\dot{r}_{\nu}='+'10^{%g}~nm/sec$' % (r_nu_dot_exponent_list[r_nu_dot_indx])
+            for r_nu_dot_indx in range(r_nu_dot_num)
+        ]
+        r_nu_dot_comparison_label_list = [
+            r'$\textrm{c}u\textrm{FJC scission},~\dot{r}_{\nu}='+'10^{%g}~nm/sec$' % (r_nu_dot_exponent_list[r_nu_dot_indx])
+            for r_nu_dot_indx in range(r_nu_dot_num)
+        ]
+        r_nu_dot_comparison_overline_label_list = [
+            r'$\textrm{c}u\textrm{FJC scission},~\dot{r}_{\nu}='+'10^{%g}~nm/sec$' % (r_nu_dot_exponent_list[r_nu_dot_indx])
             for r_nu_dot_indx in range(r_nu_dot_num)
         ]
         r_nu_dot_color_list = ['orange', 'purple', 'green']
         r_nu_dot_color_list = r_nu_dot_color_list[::-1]
+        r_nu_dot_linestyle_list = ['-', '-', '-']
+        r_nu_dot_linestyle_list = r_nu_dot_linestyle_list[::-1]
+        r_nu_dot_comparison_color_list = ['orange', 'purple', 'green']
+        r_nu_dot_comparison_color_list = r_nu_dot_comparison_color_list[::-1]
+        r_nu_dot_comparison_linestyle_list = ['-.', '-.', '-.']
+        r_nu_dot_comparison_linestyle_list = (
+            r_nu_dot_comparison_linestyle_list[::-1]
+        )
 
-        p.characterizer.r_nu_dot_list          = r_nu_dot_list
-        p.characterizer.r_nu_dot_num           = r_nu_dot_num
+        p.characterizer.r_nu_dot_list = r_nu_dot_list
+        p.characterizer.r_nu_dot_num = r_nu_dot_num
         p.characterizer.r_nu_dot_exponent_list = r_nu_dot_exponent_list
-        p.characterizer.r_nu_dot_label_list    = r_nu_dot_label_list
-        p.characterizer.r_nu_dot_color_list    = r_nu_dot_color_list
+        p.characterizer.r_nu_dot_label_list = r_nu_dot_label_list
+        p.characterizer.r_nu_dot_overline_label_list = (
+            r_nu_dot_overline_label_list
+        )
+        p.characterizer.r_nu_dot_comparison_label_list = (
+            r_nu_dot_comparison_label_list
+        )
+        p.characterizer.r_nu_dot_comparison_overline_label_list = (
+            r_nu_dot_comparison_overline_label_list
+        )
+        p.characterizer.r_nu_dot_color_list = r_nu_dot_color_list
+        p.characterizer.r_nu_dot_linestyle_list = r_nu_dot_linestyle_list
+        p.characterizer.r_nu_dot_comparison_color_list = (
+            r_nu_dot_comparison_color_list
+        )
+        p.characterizer.r_nu_dot_comparison_linestyle_list = (
+            r_nu_dot_comparison_linestyle_list
+        )
 
     def prefix(self):
         """Set characterization prefix"""
@@ -207,15 +308,11 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
             cp.chain_data_directory+data_file_prefix+'-composite-uFJC-curve-fit-l_nu_eq_intgr_nu'+'.txt')
         
         nu_list_mpi_scatter = self.comm.scatter(cp.nu_list_mpi_split, root=0)
-        check_xi_c_dot_list_mpi_scatter = self.comm.scatter(cp.check_xi_c_dot_list_mpi_split, root=0)
         
         rate_independent_AFM_exprmt_single_chain = (
-            RateIndependentScissionCompositeuFJC(nu=nu, zeta_nu_char=zeta_nu_char,
+            RateIndependentScissionCompositeuFJC(nu=nu,
+                                                 zeta_nu_char=zeta_nu_char,
                                                  kappa_nu=kappa_nu)
-        )
-        rate_dependent_AFM_exprmt_single_chain = (
-            RateDependentScissionCompositeuFJC(nu=nu, zeta_nu_char=zeta_nu_char,
-                                               kappa_nu=kappa_nu, omega_0=omega_0)
         )
         
         beyer_2000_f_c_max_tau_b_list = (
@@ -233,45 +330,69 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
         
         rate_independent_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter = []
         rate_independent_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter = []
-        rate_independent_g_c_crit___nu_chunk_list_mpi_scatter = []
-        rate_independent_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter = []
+        rate_independent_g_c___nu_chunk_list_mpi_scatter = []
+        rate_independent_g_c__nu___nu_chunk_list_mpi_scatter = []
         rate_independent_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter = []
         rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter = []
-        rate_independent_overline_g_c_crit___nu_chunk_list_mpi_scatter = []
-        rate_independent_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter = []
+        rate_independent_overline_g_c___nu_chunk_list_mpi_scatter = []
+        rate_independent_overline_g_c__nu___nu_chunk_list_mpi_scatter = []
         
-        rate_independent_LT_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter = []
-        rate_independent_LT_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter = []
-        rate_independent_LT_g_c_crit___nu_chunk_list_mpi_scatter = []
-        rate_independent_LT_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter = []
-        rate_independent_LT_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter = []
-        rate_independent_LT_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter = []
-        rate_independent_LT_overline_g_c_crit___nu_chunk_list_mpi_scatter = []
-        rate_independent_LT_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter = []
+        rate_independent_LT_full_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_scatter = []
+        rate_independent_LT_full_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_scatter = []
+        rate_independent_LT_full_zeta_nu_char_g_c___nu_chunk_list_mpi_scatter = []
+        rate_independent_LT_full_zeta_nu_char_g_c__nu___nu_chunk_list_mpi_scatter = []
+        rate_independent_LT_full_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_scatter = []
+        rate_independent_LT_full_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_scatter = []
+        rate_independent_LT_full_zeta_nu_char_overline_g_c___nu_chunk_list_mpi_scatter = []
+        rate_independent_LT_full_zeta_nu_char_overline_g_c__nu___nu_chunk_list_mpi_scatter = []
         
-        rate_independent_LT_inext_gaussian_g_c_crit___nu_chunk_list_mpi_scatter = []
-        rate_independent_LT_inext_gaussian_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter = []
-        rate_independent_LT_inext_gaussian_overline_g_c_crit___nu_chunk_list_mpi_scatter = []
-        rate_independent_LT_inext_gaussian_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter = []
+        rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list_mpi_scatter = []
+        rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list_mpi_scatter = []
+        rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list_mpi_scatter = []
+        rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list_mpi_scatter = []
+
+        rate_independent_LT_quarter_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_scatter = []
+        rate_independent_LT_quarter_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_scatter = []
+        rate_independent_LT_quarter_zeta_nu_char_g_c___nu_chunk_list_mpi_scatter = []
+        rate_independent_LT_quarter_zeta_nu_char_g_c__nu___nu_chunk_list_mpi_scatter = []
+        rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_scatter = []
+        rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_scatter = []
+        rate_independent_LT_quarter_zeta_nu_char_overline_g_c___nu_chunk_list_mpi_scatter = []
+        rate_independent_LT_quarter_zeta_nu_char_overline_g_c__nu___nu_chunk_list_mpi_scatter = []
         
-        rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter = []
-        rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter = []
-        rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit___nu_chunk_list_mpi_scatter = []
-        rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter = []
-        rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter = []
-        rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter = []
-        rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit___nu_chunk_list_mpi_scatter = []
-        rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter = []
+        rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list_mpi_scatter = []
+        rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list_mpi_scatter = []
+        rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list_mpi_scatter = []
+        rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list_mpi_scatter = []
+        
+        rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_scatter = []
+        rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_scatter = []
+        rate_independent_beyer_2000_f_c_max_tau_b_g_c___nu_chunk_list_mpi_scatter = []
+        rate_independent_beyer_2000_f_c_max_tau_b_g_c__nu___nu_chunk_list_mpi_scatter = []
+        rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_scatter = []
+        rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_scatter = []
+        rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c___nu_chunk_list_mpi_scatter = []
+        rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c__nu___nu_chunk_list_mpi_scatter = []
+
+        rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c___nu_chunk_list_mpi_scatter = []
+        rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu___nu_chunk_list_mpi_scatter = []
+        rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c___nu_chunk_list_mpi_scatter = []
+        rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu___nu_chunk_list_mpi_scatter = []
 
         for nu_val in nu_list_mpi_scatter:
-            rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_diss_hat_crit = []
-            rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_diss_hat_crit = []
-            rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit = []
-            rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit__nu_squared = []
-            rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_diss_hat_crit = []
-            rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_diss_hat_crit = []
-            rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit = []
-            rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit__nu_squared = []
+            rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_sci_hat_crit = []
+            rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_sci_hat_crit = []
+            rate_independent_beyer_2000_f_c_max_tau_b_g_c = []
+            rate_independent_beyer_2000_f_c_max_tau_b_g_c__nu = []
+            rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_sci_hat_crit = []
+            rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_sci_hat_crit = []
+            rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c = []
+            rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c__nu = []
+
+            rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c = []
+            rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu = []
+            rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c = []
+            rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu = []
 
             rate_independent_single_chain = (
                 RateIndependentScissionCompositeuFJC(nu=nu_val,
@@ -291,11 +412,11 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
             rate_independent_epsilon_c_diss_hat_crit_val = (
                 nu_val * rate_independent_epsilon_cnu_diss_hat_crit_val
             )
-            rate_independent_g_c_crit_val = (
-                rate_independent_single_chain.g_c_crit
+            rate_independent_g_c_val = (
+                rate_independent_single_chain.g_c_crit / nu_val
             )
-            rate_independent_g_c_crit__nu_squared_val = (
-                rate_independent_g_c_crit_val / nu_val**2
+            rate_independent_g_c__nu_val = (
+                rate_independent_g_c_val / nu_val
             )
             rate_independent_overline_epsilon_cnu_diss_hat_crit_val = (
                 rate_independent_epsilon_cnu_diss_hat_crit_val / zeta_nu_char
@@ -303,208 +424,499 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
             rate_independent_overline_epsilon_c_diss_hat_crit_val = (
                 nu_val * rate_independent_overline_epsilon_cnu_diss_hat_crit_val
             )
-            rate_independent_overline_g_c_crit_val = (
-                rate_independent_g_c_crit_val / zeta_nu_char
+            rate_independent_overline_g_c_val = (
+                rate_independent_g_c_val / zeta_nu_char
             )
-            rate_independent_overline_g_c_crit__nu_squared_val = (
-                rate_independent_overline_g_c_crit_val / nu_val**2
-            )
-
-            rate_independent_LT_epsilon_cnu_diss_hat_crit_val = zeta_nu_char
-            rate_independent_LT_epsilon_c_diss_hat_crit_val = (
-                nu_val * rate_independent_LT_epsilon_cnu_diss_hat_crit_val
-            )
-            rate_independent_LT_g_c_crit_val = (
-                0.5 * A_nu_val * nu_val**2 * rate_independent_LT_epsilon_cnu_diss_hat_crit_val
-            )
-            rate_independent_LT_g_c_crit__nu_squared_val = (
-                rate_independent_LT_g_c_crit_val / nu_val**2
-            )
-            rate_independent_LT_overline_epsilon_cnu_diss_hat_crit_val = 1.
-            rate_independent_LT_overline_epsilon_c_diss_hat_crit_val = (
-                nu_val * rate_independent_LT_overline_epsilon_cnu_diss_hat_crit_val
-            )
-            rate_independent_LT_overline_g_c_crit_val = (
-                0.5 * A_nu_val * nu_val**2 * rate_independent_LT_overline_epsilon_cnu_diss_hat_crit_val
-            )
-            rate_independent_LT_overline_g_c_crit__nu_squared_val = (
-                rate_independent_LT_overline_g_c_crit_val / nu_val**2
+            rate_independent_overline_g_c__nu_val = (
+                rate_independent_overline_g_c_val / nu_val
             )
 
-            rate_independent_LT_inext_gaussian_g_c_crit_val = (
-                0.5 * inext_gaussian_A_nu_val * nu_val**2 * rate_independent_LT_epsilon_cnu_diss_hat_crit_val
+            rate_independent_LT_full_zeta_nu_char_epsilon_cnu_sci_hat_crit_val = (
+                zeta_nu_char
             )
-            rate_independent_LT_inext_gaussian_g_c_crit__nu_squared_val = (
-                rate_independent_LT_inext_gaussian_g_c_crit_val / nu_val**2
+            rate_independent_LT_full_zeta_nu_char_epsilon_c_sci_hat_crit_val = (
+                nu_val
+                * rate_independent_LT_full_zeta_nu_char_epsilon_cnu_sci_hat_crit_val
             )
-            rate_independent_LT_inext_gaussian_overline_g_c_crit_val = (
-                0.5 * inext_gaussian_A_nu_val * nu_val**2 * rate_independent_LT_overline_epsilon_cnu_diss_hat_crit_val
+            rate_independent_LT_full_zeta_nu_char_g_c_val = (
+                0.5 * A_nu_val * nu_val
+                * rate_independent_LT_full_zeta_nu_char_epsilon_cnu_sci_hat_crit_val
             )
-            rate_independent_LT_inext_gaussian_overline_g_c_crit__nu_squared_val = (
-                rate_independent_LT_inext_gaussian_overline_g_c_crit_val / nu_val**2
+            rate_independent_LT_full_zeta_nu_char_g_c__nu_val = (
+                rate_independent_LT_full_zeta_nu_char_g_c_val / nu_val
+            )
+            rate_independent_LT_full_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit_val = (
+                1.
+            )
+            rate_independent_LT_full_zeta_nu_char_overline_epsilon_c_sci_hat_crit_val = (
+                nu_val
+                * rate_independent_LT_full_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit_val
+            )
+            rate_independent_LT_full_zeta_nu_char_overline_g_c_val = (
+                0.5 * A_nu_val * nu_val
+                * rate_independent_LT_full_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit_val
+            )
+            rate_independent_LT_full_zeta_nu_char_overline_g_c__nu_val = (
+                rate_independent_LT_full_zeta_nu_char_overline_g_c_val / nu_val
+            )
+
+            rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c_val = (
+                0.5 * inext_gaussian_A_nu_val * nu_val
+                * rate_independent_LT_full_zeta_nu_char_epsilon_cnu_sci_hat_crit_val
+            )
+            rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c__nu_val = (
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c_val
+                / nu_val
+            )
+            rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c_val = (
+                0.5 * inext_gaussian_A_nu_val * nu_val
+                * rate_independent_LT_full_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit_val
+            )
+            rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c__nu_val = (
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c_val
+                / nu_val
+            )
+
+            rate_independent_LT_quarter_zeta_nu_char_epsilon_cnu_sci_hat_crit_val = (
+                zeta_nu_char / 4.
+            )
+            rate_independent_LT_quarter_zeta_nu_char_epsilon_c_sci_hat_crit_val = (
+                nu_val
+                * rate_independent_LT_quarter_zeta_nu_char_epsilon_cnu_sci_hat_crit_val
+            )
+            rate_independent_LT_quarter_zeta_nu_char_g_c_val = (
+                0.5 * A_nu_val * nu_val
+                * rate_independent_LT_quarter_zeta_nu_char_epsilon_cnu_sci_hat_crit_val
+            )
+            rate_independent_LT_quarter_zeta_nu_char_g_c__nu_val = (
+                rate_independent_LT_quarter_zeta_nu_char_g_c_val / nu_val
+            )
+            rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit_val = (
+                0.25
+            )
+            rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_c_sci_hat_crit_val = (
+                nu_val
+                * rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit_val
+            )
+            rate_independent_LT_quarter_zeta_nu_char_overline_g_c_val = (
+                0.5 * A_nu_val * nu_val
+                * rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit_val
+            )
+            rate_independent_LT_quarter_zeta_nu_char_overline_g_c__nu_val = (
+                rate_independent_LT_quarter_zeta_nu_char_overline_g_c_val
+                / nu_val
+            )
+
+            rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c_val = (
+                0.5 * inext_gaussian_A_nu_val * nu_val
+                * rate_independent_LT_quarter_zeta_nu_char_epsilon_cnu_sci_hat_crit_val
+            )
+            rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c__nu_val = (
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c_val
+                / nu_val
+            )
+            rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c_val = (
+                0.5 * inext_gaussian_A_nu_val * nu_val
+                * rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit_val
+            )
+            rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c__nu_val = (
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c_val
+                / nu_val
             )
 
             for f_c_max_val in beyer_2000_f_c_max_tau_b_list:
                 xi_c_max_val = f_c_max_val * beta * l_nu_eq
                 lmbda_nu_xi_c_max_val = (
-                    rate_independent_AFM_exprmt_single_chain.lmbda_nu_xi_c_hat_func(xi_c_max_val)
+                    rate_independent_AFM_exprmt_single_chain.lmbda_nu_xi_c_hat_func(
+                        xi_c_max_val)
                 )
-                epsilon_cnu_diss_hat_crit_val = (
-                    rate_independent_AFM_exprmt_single_chain.epsilon_cnu_sci_hat_func(lmbda_nu_xi_c_max_val)
+                epsilon_cnu_sci_hat_crit_val = (
+                    rate_independent_AFM_exprmt_single_chain.epsilon_cnu_sci_hat_func(
+                        lmbda_nu_xi_c_max_val)
                 )
-                epsilon_c_diss_hat_crit_val = (
-                    nu_val * epsilon_cnu_diss_hat_crit_val
+                epsilon_c_sci_hat_crit_val = (
+                    nu_val * epsilon_cnu_sci_hat_crit_val
                 )
-                g_c_crit_val = 0.5 * A_nu_val * nu_val**2 * epsilon_cnu_diss_hat_crit_val
-                g_c_crit__nu_squared_val = g_c_crit_val / nu_val**2
-                overline_epsilon_cnu_diss_hat_crit_val = epsilon_cnu_diss_hat_crit_val / zeta_nu_char
-                overline_epsilon_c_diss_hat_crit_val = (
-                    nu_val * overline_epsilon_cnu_diss_hat_crit_val
+                g_c_val = 0.5 * A_nu_val * nu_val * epsilon_cnu_sci_hat_crit_val
+                g_c__nu_val = g_c_val / nu_val
+                overline_epsilon_cnu_sci_hat_crit_val = (
+                    epsilon_cnu_sci_hat_crit_val / zeta_nu_char
                 )
-                overline_g_c_crit_val = 0.5 * A_nu_val * nu_val**2 * overline_epsilon_cnu_diss_hat_crit_val
-                overline_g_c_crit__nu_squared_val = overline_g_c_crit_val / nu_val**2
+                overline_epsilon_c_sci_hat_crit_val = (
+                    nu_val * overline_epsilon_cnu_sci_hat_crit_val
+                )
+                overline_g_c_val = (
+                    0.5 * A_nu_val * nu_val
+                    * overline_epsilon_cnu_sci_hat_crit_val
+                )
+                overline_g_c__nu_val = overline_g_c_val / nu_val
 
-                rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_diss_hat_crit.append(epsilon_cnu_diss_hat_crit_val)
-                rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_diss_hat_crit.append(epsilon_c_diss_hat_crit_val)
-                rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit.append(g_c_crit_val)
-                rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit__nu_squared.append(g_c_crit__nu_squared_val)
-                rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_diss_hat_crit.append(overline_epsilon_cnu_diss_hat_crit_val)
-                rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_diss_hat_crit.append(overline_epsilon_c_diss_hat_crit_val)
-                rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit.append(overline_g_c_crit_val)
-                rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit__nu_squared.append(overline_g_c_crit__nu_squared_val)
+                inext_gaussian_g_c_val = (
+                    0.5 * inext_gaussian_A_nu_val * nu_val
+                    * epsilon_cnu_sci_hat_crit_val
+                )
+                inext_gaussian_g_c__nu_val = inext_gaussian_g_c_val / nu_val
+                inext_gaussian_overline_g_c_val = (
+                    0.5 * inext_gaussian_A_nu_val * nu_val
+                    * overline_epsilon_cnu_sci_hat_crit_val
+                )
+                inext_gaussian_overline_g_c__nu_val = (
+                    inext_gaussian_overline_g_c_val / nu_val
+                )
+
+                rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_sci_hat_crit.append(
+                    epsilon_cnu_sci_hat_crit_val)
+                rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_sci_hat_crit.append(
+                    epsilon_c_sci_hat_crit_val)
+                rate_independent_beyer_2000_f_c_max_tau_b_g_c.append(
+                    g_c_val)
+                rate_independent_beyer_2000_f_c_max_tau_b_g_c__nu.append(
+                    g_c__nu_val)
+                rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_sci_hat_crit.append(
+                    overline_epsilon_cnu_sci_hat_crit_val)
+                rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_sci_hat_crit.append(
+                    overline_epsilon_c_sci_hat_crit_val)
+                rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c.append(
+                    overline_g_c_val)
+                rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c__nu.append(
+                    overline_g_c__nu_val)
+                
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c.append(
+                    inext_gaussian_g_c_val)
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu.append(
+                    inext_gaussian_g_c__nu_val)
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c.append(
+                    inext_gaussian_overline_g_c_val)
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu.append(
+                    inext_gaussian_overline_g_c__nu_val)
 
             A_nu___nu_chunk_list_mpi_scatter.append(A_nu_val)
-            inext_gaussian_A_nu___nu_chunk_list_mpi_scatter.append(inext_gaussian_A_nu_val)
-            inext_gaussian_A_nu_err___nu_chunk_list_mpi_scatter.append(inext_gaussian_A_nu_err_val)
+            inext_gaussian_A_nu___nu_chunk_list_mpi_scatter.append(
+                inext_gaussian_A_nu_val)
+            inext_gaussian_A_nu_err___nu_chunk_list_mpi_scatter.append(
+                inext_gaussian_A_nu_err_val)
 
-            rate_independent_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter.append(rate_independent_epsilon_cnu_diss_hat_crit_val)
-            rate_independent_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter.append(rate_independent_epsilon_c_diss_hat_crit_val)
-            rate_independent_g_c_crit___nu_chunk_list_mpi_scatter.append(rate_independent_g_c_crit_val)
-            rate_independent_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter.append(rate_independent_g_c_crit__nu_squared_val)
-            rate_independent_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter.append(rate_independent_overline_epsilon_cnu_diss_hat_crit_val)
-            rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter.append(rate_independent_overline_epsilon_c_diss_hat_crit_val)
-            rate_independent_overline_g_c_crit___nu_chunk_list_mpi_scatter.append(rate_independent_overline_g_c_crit_val)
-            rate_independent_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter.append(rate_independent_overline_g_c_crit__nu_squared_val)
+            rate_independent_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter.append(
+                rate_independent_epsilon_cnu_diss_hat_crit_val)
+            rate_independent_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter.append(
+                rate_independent_epsilon_c_diss_hat_crit_val)
+            rate_independent_g_c___nu_chunk_list_mpi_scatter.append(
+                rate_independent_g_c_val)
+            rate_independent_g_c__nu___nu_chunk_list_mpi_scatter.append(
+                rate_independent_g_c__nu_val)
+            rate_independent_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter.append(
+                rate_independent_overline_epsilon_cnu_diss_hat_crit_val)
+            rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter.append(
+                rate_independent_overline_epsilon_c_diss_hat_crit_val)
+            rate_independent_overline_g_c___nu_chunk_list_mpi_scatter.append(
+                rate_independent_overline_g_c_val)
+            rate_independent_overline_g_c__nu___nu_chunk_list_mpi_scatter.append(
+                rate_independent_overline_g_c__nu_val)
 
-            rate_independent_LT_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter.append(rate_independent_LT_epsilon_cnu_diss_hat_crit_val)
-            rate_independent_LT_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter.append(rate_independent_LT_epsilon_c_diss_hat_crit_val)
-            rate_independent_LT_g_c_crit___nu_chunk_list_mpi_scatter.append(rate_independent_LT_g_c_crit_val)
-            rate_independent_LT_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter.append(rate_independent_LT_g_c_crit__nu_squared_val)
-            rate_independent_LT_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter.append(rate_independent_LT_overline_epsilon_cnu_diss_hat_crit_val)
-            rate_independent_LT_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter.append(rate_independent_LT_overline_epsilon_c_diss_hat_crit_val)
-            rate_independent_LT_overline_g_c_crit___nu_chunk_list_mpi_scatter.append(rate_independent_LT_overline_g_c_crit_val)
-            rate_independent_LT_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter.append(rate_independent_LT_overline_g_c_crit__nu_squared_val)
+            rate_independent_LT_full_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_scatter.append(
+                rate_independent_LT_full_zeta_nu_char_epsilon_cnu_sci_hat_crit_val)
+            rate_independent_LT_full_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_scatter.append(
+                rate_independent_LT_full_zeta_nu_char_epsilon_c_sci_hat_crit_val)
+            rate_independent_LT_full_zeta_nu_char_g_c___nu_chunk_list_mpi_scatter.append(
+                rate_independent_LT_full_zeta_nu_char_g_c_val)
+            rate_independent_LT_full_zeta_nu_char_g_c__nu___nu_chunk_list_mpi_scatter.append(
+                rate_independent_LT_full_zeta_nu_char_g_c__nu_val)
+            rate_independent_LT_full_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_scatter.append(
+                rate_independent_LT_full_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit_val)
+            rate_independent_LT_full_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_scatter.append(
+                rate_independent_LT_full_zeta_nu_char_overline_epsilon_c_sci_hat_crit_val)
+            rate_independent_LT_full_zeta_nu_char_overline_g_c___nu_chunk_list_mpi_scatter.append(
+                rate_independent_LT_full_zeta_nu_char_overline_g_c_val)
+            rate_independent_LT_full_zeta_nu_char_overline_g_c__nu___nu_chunk_list_mpi_scatter.append(
+                rate_independent_LT_full_zeta_nu_char_overline_g_c__nu_val)
 
-            rate_independent_LT_inext_gaussian_g_c_crit___nu_chunk_list_mpi_scatter.append(rate_independent_LT_inext_gaussian_g_c_crit_val)
-            rate_independent_LT_inext_gaussian_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter.append(rate_independent_LT_inext_gaussian_g_c_crit__nu_squared_val)
-            rate_independent_LT_inext_gaussian_overline_g_c_crit___nu_chunk_list_mpi_scatter.append(rate_independent_LT_inext_gaussian_overline_g_c_crit_val)
-            rate_independent_LT_inext_gaussian_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter.append(rate_independent_LT_inext_gaussian_overline_g_c_crit__nu_squared_val)
+            rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list_mpi_scatter.append(
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c_val)
+            rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list_mpi_scatter.append(
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c__nu_val)
+            rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list_mpi_scatter.append(
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c_val)
+            rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list_mpi_scatter.append(
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c__nu_val)
 
-            rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter.append(rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_diss_hat_crit)
-            rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter.append(rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_diss_hat_crit)
-            rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit___nu_chunk_list_mpi_scatter.append(rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit)
-            rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter.append(rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit__nu_squared)
-            rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter.append(rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_diss_hat_crit)
-            rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter.append(rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_diss_hat_crit)
-            rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit___nu_chunk_list_mpi_scatter.append(rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit)
-            rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter.append(rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit__nu_squared)
+            rate_independent_LT_quarter_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_scatter.append(
+                rate_independent_LT_quarter_zeta_nu_char_epsilon_cnu_sci_hat_crit_val)
+            rate_independent_LT_quarter_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_scatter.append(
+                rate_independent_LT_quarter_zeta_nu_char_epsilon_c_sci_hat_crit_val)
+            rate_independent_LT_quarter_zeta_nu_char_g_c___nu_chunk_list_mpi_scatter.append(
+                rate_independent_LT_quarter_zeta_nu_char_g_c_val)
+            rate_independent_LT_quarter_zeta_nu_char_g_c__nu___nu_chunk_list_mpi_scatter.append(
+                rate_independent_LT_quarter_zeta_nu_char_g_c__nu_val)
+            rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_scatter.append(
+                rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit_val)
+            rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_scatter.append(
+                rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_c_sci_hat_crit_val)
+            rate_independent_LT_quarter_zeta_nu_char_overline_g_c___nu_chunk_list_mpi_scatter.append(
+                rate_independent_LT_quarter_zeta_nu_char_overline_g_c_val)
+            rate_independent_LT_quarter_zeta_nu_char_overline_g_c__nu___nu_chunk_list_mpi_scatter.append(
+                rate_independent_LT_quarter_zeta_nu_char_overline_g_c__nu_val)
+
+            rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list_mpi_scatter.append(
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c_val)
+            rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list_mpi_scatter.append(
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c__nu_val)
+            rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list_mpi_scatter.append(
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c_val)
+            rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list_mpi_scatter.append(
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c__nu_val)
+
+            rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_scatter.append(
+                rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_sci_hat_crit)
+            rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_scatter.append(
+                rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_sci_hat_crit)
+            rate_independent_beyer_2000_f_c_max_tau_b_g_c___nu_chunk_list_mpi_scatter.append(
+                rate_independent_beyer_2000_f_c_max_tau_b_g_c)
+            rate_independent_beyer_2000_f_c_max_tau_b_g_c__nu___nu_chunk_list_mpi_scatter.append(
+                rate_independent_beyer_2000_f_c_max_tau_b_g_c__nu)
+            rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_scatter.append(
+                rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_sci_hat_crit)
+            rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_scatter.append(
+                rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_sci_hat_crit)
+            rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c___nu_chunk_list_mpi_scatter.append(
+                rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c)
+            rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c__nu___nu_chunk_list_mpi_scatter.append(
+                rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c__nu)
+            
+            rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c___nu_chunk_list_mpi_scatter.append(
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c)
+            rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu___nu_chunk_list_mpi_scatter.append(
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu)
+            rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c___nu_chunk_list_mpi_scatter.append(
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c)
+            rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu___nu_chunk_list_mpi_scatter.append(
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu)
         
         A_nu___nu_chunk_list_mpi_split = self.comm.gather(
-            A_nu___nu_chunk_list_mpi_scatter, root=0
-        )
+            A_nu___nu_chunk_list_mpi_scatter, root=0)
         inext_gaussian_A_nu___nu_chunk_list_mpi_split = self.comm.gather(
-            inext_gaussian_A_nu___nu_chunk_list_mpi_scatter, root=0
-        )
+            inext_gaussian_A_nu___nu_chunk_list_mpi_scatter, root=0)
         inext_gaussian_A_nu_err___nu_chunk_list_mpi_split = self.comm.gather(
-            inext_gaussian_A_nu_err___nu_chunk_list_mpi_scatter, root=0
+            inext_gaussian_A_nu_err___nu_chunk_list_mpi_scatter, root=0)
+        
+        rate_independent_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter,
+                root=0)
+        )
+        rate_independent_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter,
+                root=0)
+        )
+        rate_independent_g_c___nu_chunk_list_mpi_split = self.comm.gather(
+            rate_independent_g_c___nu_chunk_list_mpi_scatter, root=0)
+        rate_independent_g_c__nu___nu_chunk_list_mpi_split = self.comm.gather(
+            rate_independent_g_c__nu___nu_chunk_list_mpi_scatter, root=0)
+        rate_independent_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter,
+                root=0)
+        )
+        rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter,
+                root=0)
+        )
+        rate_independent_overline_g_c___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_overline_g_c___nu_chunk_list_mpi_scatter,
+                root=0)
+        )
+        rate_independent_overline_g_c__nu___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_overline_g_c__nu___nu_chunk_list_mpi_scatter,
+                root=0)
         )
         
-        rate_independent_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_independent_LT_full_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_LT_full_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_independent_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_independent_LT_full_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_LT_full_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_independent_g_c_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_g_c_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_independent_LT_full_zeta_nu_char_g_c___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_LT_full_zeta_nu_char_g_c___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_independent_g_c_crit__nu_squared___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter, root=0
+        rate_independent_LT_full_zeta_nu_char_g_c__nu___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_LT_full_zeta_nu_char_g_c__nu___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_independent_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_independent_LT_full_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_LT_full_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_independent_LT_full_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_LT_full_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_independent_overline_g_c_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_overline_g_c_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_independent_LT_full_zeta_nu_char_overline_g_c___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_LT_full_zeta_nu_char_overline_g_c___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_independent_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter, root=0
-        )
-        
-        rate_independent_LT_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_LT_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter, root=0
-        )
-        rate_independent_LT_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_LT_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter, root=0
-        )
-        rate_independent_LT_g_c_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_LT_g_c_crit___nu_chunk_list_mpi_scatter, root=0
-        )
-        rate_independent_LT_g_c_crit__nu_squared___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_LT_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter, root=0
-        )
-        rate_independent_LT_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_LT_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter, root=0
-        )
-        rate_independent_LT_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_LT_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter, root=0
-        )
-        rate_independent_LT_overline_g_c_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_LT_overline_g_c_crit___nu_chunk_list_mpi_scatter, root=0
-        )
-        rate_independent_LT_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_LT_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter, root=0
+        rate_independent_LT_full_zeta_nu_char_overline_g_c__nu___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_LT_full_zeta_nu_char_overline_g_c__nu___nu_chunk_list_mpi_scatter,
+                root=0)
         )
         
-        rate_independent_LT_inext_gaussian_g_c_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_LT_inext_gaussian_g_c_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_independent_LT_inext_gaussian_g_c_crit__nu_squared___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_LT_inext_gaussian_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter, root=0
+        rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_independent_LT_inext_gaussian_overline_g_c_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_LT_inext_gaussian_overline_g_c_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_independent_LT_inext_gaussian_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_LT_inext_gaussian_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter, root=0
+        rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list_mpi_scatter,
+                root=0)
         )
         
-        rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_independent_LT_quarter_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_LT_quarter_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_independent_LT_quarter_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_LT_quarter_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_independent_LT_quarter_zeta_nu_char_g_c___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_LT_quarter_zeta_nu_char_g_c___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit__nu_squared___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter, root=0
+        rate_independent_LT_quarter_zeta_nu_char_g_c__nu___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_LT_quarter_zeta_nu_char_g_c__nu___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_independent_LT_quarter_zeta_nu_char_overline_g_c___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_LT_quarter_zeta_nu_char_overline_g_c___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter, root=0
+        rate_independent_LT_quarter_zeta_nu_char_overline_g_c__nu___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_LT_quarter_zeta_nu_char_overline_g_c__nu___nu_chunk_list_mpi_scatter,
+                root=0)
+        )
+        
+        rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list_mpi_scatter,
+                root=0)
+        )
+        rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list_mpi_scatter,
+                root=0)
+        )
+        rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list_mpi_scatter,
+                root=0)
+        )
+        rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list_mpi_scatter,
+                root=0)
+        )
+        
+        rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_scatter,
+                root=0)
+        )
+        rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_scatter,
+                root=0)
+        )
+        rate_independent_beyer_2000_f_c_max_tau_b_g_c___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_beyer_2000_f_c_max_tau_b_g_c___nu_chunk_list_mpi_scatter,
+                root=0)
+        )
+        rate_independent_beyer_2000_f_c_max_tau_b_g_c__nu___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_beyer_2000_f_c_max_tau_b_g_c__nu___nu_chunk_list_mpi_scatter,
+                root=0)
+        )
+        rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_scatter,
+                root=0)
+        )
+        rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_scatter,
+                root=0)
+        )
+        rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c___nu_chunk_list_mpi_scatter,
+                root=0)
+        )
+        rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c__nu___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c__nu___nu_chunk_list_mpi_scatter,
+                root=0)
+        )
+        
+        rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c___nu_chunk_list_mpi_scatter,
+                root=0)
+        )
+        rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu___nu_chunk_list_mpi_scatter,
+                root=0)
+        )
+        rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c___nu_chunk_list_mpi_scatter,
+                root=0)
+        )
+        rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu___nu_chunk_list_mpi_scatter,
+                root=0)
         )
         
         self.comm.Barrier()
@@ -518,109 +930,306 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
             
             rate_independent_epsilon_cnu_diss_hat_crit___nu_chunk_list = []
             rate_independent_epsilon_c_diss_hat_crit___nu_chunk_list = []
-            rate_independent_g_c_crit___nu_chunk_list = []
-            rate_independent_g_c_crit__nu_squared___nu_chunk_list = []
+            rate_independent_g_c___nu_chunk_list = []
+            rate_independent_g_c__nu___nu_chunk_list = []
             rate_independent_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list = []
             rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_list = []
-            rate_independent_overline_g_c_crit___nu_chunk_list = []
-            rate_independent_overline_g_c_crit__nu_squared___nu_chunk_list = []
+            rate_independent_overline_g_c___nu_chunk_list = []
+            rate_independent_overline_g_c__nu___nu_chunk_list = []
             
-            rate_independent_LT_epsilon_cnu_diss_hat_crit___nu_chunk_list = []
-            rate_independent_LT_epsilon_c_diss_hat_crit___nu_chunk_list = []
-            rate_independent_LT_g_c_crit___nu_chunk_list = []
-            rate_independent_LT_g_c_crit__nu_squared___nu_chunk_list = []
-            rate_independent_LT_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list = []
-            rate_independent_LT_overline_epsilon_c_diss_hat_crit___nu_chunk_list = []
-            rate_independent_LT_overline_g_c_crit___nu_chunk_list = []
-            rate_independent_LT_overline_g_c_crit__nu_squared___nu_chunk_list = []
+            rate_independent_LT_full_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list = []
+            rate_independent_LT_full_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list = []
+            rate_independent_LT_full_zeta_nu_char_g_c___nu_chunk_list = []
+            rate_independent_LT_full_zeta_nu_char_g_c__nu___nu_chunk_list = []
+            rate_independent_LT_full_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list = []
+            rate_independent_LT_full_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list = []
+            rate_independent_LT_full_zeta_nu_char_overline_g_c___nu_chunk_list = []
+            rate_independent_LT_full_zeta_nu_char_overline_g_c__nu___nu_chunk_list = []
             
-            rate_independent_LT_inext_gaussian_g_c_crit___nu_chunk_list = []
-            rate_independent_LT_inext_gaussian_g_c_crit__nu_squared___nu_chunk_list = []
-            rate_independent_LT_inext_gaussian_overline_g_c_crit___nu_chunk_list = []
-            rate_independent_LT_inext_gaussian_overline_g_c_crit__nu_squared___nu_chunk_list = []
+            rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list = []
+            rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list = []
+            rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list = []
+            rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list = []
+
+            rate_independent_LT_quarter_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list = []
+            rate_independent_LT_quarter_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list = []
+            rate_independent_LT_quarter_zeta_nu_char_g_c___nu_chunk_list = []
+            rate_independent_LT_quarter_zeta_nu_char_g_c__nu___nu_chunk_list = []
+            rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list = []
+            rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list = []
+            rate_independent_LT_quarter_zeta_nu_char_overline_g_c___nu_chunk_list = []
+            rate_independent_LT_quarter_zeta_nu_char_overline_g_c__nu___nu_chunk_list = []
             
-            rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_diss_hat_crit___nu_chunk_list = []
-            rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_diss_hat_crit___nu_chunk_list = []
-            rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit___nu_chunk_list = []
-            rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit__nu_squared___nu_chunk_list = []
-            rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list = []
-            rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_diss_hat_crit___nu_chunk_list = []
-            rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit___nu_chunk_list = []
-            rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit__nu_squared___nu_chunk_list = []
+            rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list = []
+            rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list = []
+            rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list = []
+            rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list = []
+            
+            rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_sci_hat_crit___nu_chunk_list = []
+            rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_sci_hat_crit___nu_chunk_list = []
+            rate_independent_beyer_2000_f_c_max_tau_b_g_c___nu_chunk_list = []
+            rate_independent_beyer_2000_f_c_max_tau_b_g_c__nu___nu_chunk_list = []
+            rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list = []
+            rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_sci_hat_crit___nu_chunk_list = []
+            rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c___nu_chunk_list = []
+            rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c__nu___nu_chunk_list = []
+
+            rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c___nu_chunk_list = []
+            rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu___nu_chunk_list = []
+            rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c___nu_chunk_list = []
+            rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu___nu_chunk_list = []
 
             for proc_indx in range(self.comm_size):
                 for nu_chunk_indx in range(cp.nu_num_list_mpi_split[proc_indx]):
-                    A_nu___nu_chunk_val = A_nu___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    inext_gaussian_A_nu___nu_chunk_val = inext_gaussian_A_nu___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    inext_gaussian_A_nu_err___nu_chunk_val = inext_gaussian_A_nu_err___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    A_nu___nu_chunk_val = (
+                        A_nu___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    inext_gaussian_A_nu___nu_chunk_val = (
+                        inext_gaussian_A_nu___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    inext_gaussian_A_nu_err___nu_chunk_val = (
+                        inext_gaussian_A_nu_err___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
 
-                    rate_independent_epsilon_cnu_diss_hat_crit___nu_chunk_val = rate_independent_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_independent_epsilon_c_diss_hat_crit___nu_chunk_val = rate_independent_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_independent_g_c_crit___nu_chunk_val = rate_independent_g_c_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_independent_g_c_crit__nu_squared___nu_chunk_val = rate_independent_g_c_crit__nu_squared___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_independent_overline_epsilon_cnu_diss_hat_crit___nu_chunk_val = rate_independent_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_val = rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_independent_overline_g_c_crit___nu_chunk_val = rate_independent_overline_g_c_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_independent_overline_g_c_crit__nu_squared___nu_chunk_val = rate_independent_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    rate_independent_epsilon_cnu_diss_hat_crit___nu_chunk_val = (
+                        rate_independent_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_epsilon_c_diss_hat_crit___nu_chunk_val = (
+                        rate_independent_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_g_c___nu_chunk_val = (
+                        rate_independent_g_c___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_g_c__nu___nu_chunk_val = (
+                        rate_independent_g_c__nu___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_overline_epsilon_cnu_diss_hat_crit___nu_chunk_val = (
+                        rate_independent_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_val = (
+                        rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_overline_g_c___nu_chunk_val = (
+                        rate_independent_overline_g_c___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_overline_g_c__nu___nu_chunk_val = (
+                        rate_independent_overline_g_c__nu___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
 
-                    rate_independent_LT_epsilon_cnu_diss_hat_crit___nu_chunk_val = rate_independent_LT_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_independent_LT_epsilon_c_diss_hat_crit___nu_chunk_val = rate_independent_LT_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_independent_LT_g_c_crit___nu_chunk_val = rate_independent_LT_g_c_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_independent_LT_g_c_crit__nu_squared___nu_chunk_val = rate_independent_LT_g_c_crit__nu_squared___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_independent_LT_overline_epsilon_cnu_diss_hat_crit___nu_chunk_val = rate_independent_LT_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_independent_LT_overline_epsilon_c_diss_hat_crit___nu_chunk_val = rate_independent_LT_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_independent_LT_overline_g_c_crit___nu_chunk_val = rate_independent_LT_overline_g_c_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_independent_LT_overline_g_c_crit__nu_squared___nu_chunk_val = rate_independent_LT_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    rate_independent_LT_full_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_val = (
+                        rate_independent_LT_full_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_LT_full_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_val = (
+                        rate_independent_LT_full_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_LT_full_zeta_nu_char_g_c___nu_chunk_val = (
+                        rate_independent_LT_full_zeta_nu_char_g_c___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_LT_full_zeta_nu_char_g_c__nu___nu_chunk_val = (
+                        rate_independent_LT_full_zeta_nu_char_g_c__nu___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_LT_full_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_val = (
+                        rate_independent_LT_full_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_LT_full_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_val = (
+                        rate_independent_LT_full_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_LT_full_zeta_nu_char_overline_g_c___nu_chunk_val = (
+                        rate_independent_LT_full_zeta_nu_char_overline_g_c___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_LT_full_zeta_nu_char_overline_g_c__nu___nu_chunk_val = (
+                        rate_independent_LT_full_zeta_nu_char_overline_g_c__nu___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
 
-                    rate_independent_LT_inext_gaussian_g_c_crit___nu_chunk_val = rate_independent_LT_inext_gaussian_g_c_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_independent_LT_inext_gaussian_g_c_crit__nu_squared___nu_chunk_val = rate_independent_LT_inext_gaussian_g_c_crit__nu_squared___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_independent_LT_inext_gaussian_overline_g_c_crit___nu_chunk_val = rate_independent_LT_inext_gaussian_overline_g_c_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_independent_LT_inext_gaussian_overline_g_c_crit__nu_squared___nu_chunk_val = rate_independent_LT_inext_gaussian_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c___nu_chunk_val = (
+                        rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_val = (
+                        rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_val = (
+                        rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_val = (
+                        rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
 
-                    rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_diss_hat_crit___nu_chunk_val = rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_diss_hat_crit___nu_chunk_val = rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit___nu_chunk_val = rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit__nu_squared___nu_chunk_val = rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit__nu_squared___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_diss_hat_crit___nu_chunk_val = rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_diss_hat_crit___nu_chunk_val = rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit___nu_chunk_val = rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit__nu_squared___nu_chunk_val = rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    rate_independent_LT_quarter_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_val = (
+                        rate_independent_LT_quarter_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_LT_quarter_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_val = (
+                        rate_independent_LT_quarter_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_LT_quarter_zeta_nu_char_g_c___nu_chunk_val = (
+                        rate_independent_LT_quarter_zeta_nu_char_g_c___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_LT_quarter_zeta_nu_char_g_c__nu___nu_chunk_val = (
+                        rate_independent_LT_quarter_zeta_nu_char_g_c__nu___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_val = (
+                        rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_val = (
+                        rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_LT_quarter_zeta_nu_char_overline_g_c___nu_chunk_val = (
+                        rate_independent_LT_quarter_zeta_nu_char_overline_g_c___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_LT_quarter_zeta_nu_char_overline_g_c__nu___nu_chunk_val = (
+                        rate_independent_LT_quarter_zeta_nu_char_overline_g_c__nu___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+
+                    rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c___nu_chunk_val = (
+                        rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_val = (
+                        rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_val = (
+                        rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_val = (
+                        rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+
+                    rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_sci_hat_crit___nu_chunk_val = (
+                        rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_sci_hat_crit___nu_chunk_val = (
+                        rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_beyer_2000_f_c_max_tau_b_g_c___nu_chunk_val = (
+                        rate_independent_beyer_2000_f_c_max_tau_b_g_c___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_beyer_2000_f_c_max_tau_b_g_c__nu___nu_chunk_val = (
+                        rate_independent_beyer_2000_f_c_max_tau_b_g_c__nu___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_sci_hat_crit___nu_chunk_val = (
+                        rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_sci_hat_crit___nu_chunk_val = (
+                        rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_sci_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c___nu_chunk_val = (
+                        rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c__nu___nu_chunk_val = (
+                        rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c__nu___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c___nu_chunk_val = (
+                        rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu___nu_chunk_val = (
+                        rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c___nu_chunk_val = (
+                        rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu___nu_chunk_val = (
+                        rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
 
                     A_nu___nu_chunk_list.append(A_nu___nu_chunk_val)
-                    inext_gaussian_A_nu___nu_chunk_list.append(inext_gaussian_A_nu___nu_chunk_val)
-                    inext_gaussian_A_nu_err___nu_chunk_list.append(inext_gaussian_A_nu_err___nu_chunk_val)
+                    inext_gaussian_A_nu___nu_chunk_list.append(
+                        inext_gaussian_A_nu___nu_chunk_val)
+                    inext_gaussian_A_nu_err___nu_chunk_list.append(
+                        inext_gaussian_A_nu_err___nu_chunk_val)
 
-                    rate_independent_epsilon_cnu_diss_hat_crit___nu_chunk_list.append(rate_independent_epsilon_cnu_diss_hat_crit___nu_chunk_val)
-                    rate_independent_epsilon_c_diss_hat_crit___nu_chunk_list.append(rate_independent_epsilon_c_diss_hat_crit___nu_chunk_val)
-                    rate_independent_g_c_crit___nu_chunk_list.append(rate_independent_g_c_crit___nu_chunk_val)
-                    rate_independent_g_c_crit__nu_squared___nu_chunk_list.append(rate_independent_g_c_crit__nu_squared___nu_chunk_val)
-                    rate_independent_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list.append(rate_independent_overline_epsilon_cnu_diss_hat_crit___nu_chunk_val)
-                    rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_list.append(rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_val)
-                    rate_independent_overline_g_c_crit___nu_chunk_list.append(rate_independent_overline_g_c_crit___nu_chunk_val)
-                    rate_independent_overline_g_c_crit__nu_squared___nu_chunk_list.append(rate_independent_overline_g_c_crit__nu_squared___nu_chunk_val)
+                    rate_independent_epsilon_cnu_diss_hat_crit___nu_chunk_list.append(
+                        rate_independent_epsilon_cnu_diss_hat_crit___nu_chunk_val)
+                    rate_independent_epsilon_c_diss_hat_crit___nu_chunk_list.append(
+                        rate_independent_epsilon_c_diss_hat_crit___nu_chunk_val)
+                    rate_independent_g_c___nu_chunk_list.append(
+                        rate_independent_g_c___nu_chunk_val)
+                    rate_independent_g_c__nu___nu_chunk_list.append(
+                        rate_independent_g_c__nu___nu_chunk_val)
+                    rate_independent_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list.append(
+                        rate_independent_overline_epsilon_cnu_diss_hat_crit___nu_chunk_val)
+                    rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_list.append(
+                        rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_val)
+                    rate_independent_overline_g_c___nu_chunk_list.append(
+                        rate_independent_overline_g_c___nu_chunk_val)
+                    rate_independent_overline_g_c__nu___nu_chunk_list.append(
+                        rate_independent_overline_g_c__nu___nu_chunk_val)
 
-                    rate_independent_LT_epsilon_cnu_diss_hat_crit___nu_chunk_list.append(rate_independent_LT_epsilon_cnu_diss_hat_crit___nu_chunk_val)
-                    rate_independent_LT_epsilon_c_diss_hat_crit___nu_chunk_list.append(rate_independent_LT_epsilon_c_diss_hat_crit___nu_chunk_val)
-                    rate_independent_LT_g_c_crit___nu_chunk_list.append(rate_independent_LT_g_c_crit___nu_chunk_val)
-                    rate_independent_LT_g_c_crit__nu_squared___nu_chunk_list.append(rate_independent_LT_g_c_crit__nu_squared___nu_chunk_val)
-                    rate_independent_LT_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list.append(rate_independent_LT_overline_epsilon_cnu_diss_hat_crit___nu_chunk_val)
-                    rate_independent_LT_overline_epsilon_c_diss_hat_crit___nu_chunk_list.append(rate_independent_LT_overline_epsilon_c_diss_hat_crit___nu_chunk_val)
-                    rate_independent_LT_overline_g_c_crit___nu_chunk_list.append(rate_independent_LT_overline_g_c_crit___nu_chunk_val)
-                    rate_independent_LT_overline_g_c_crit__nu_squared___nu_chunk_list.append(rate_independent_LT_overline_g_c_crit__nu_squared___nu_chunk_val)
+                    rate_independent_LT_full_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list.append(
+                        rate_independent_LT_full_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_val)
+                    rate_independent_LT_full_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list.append(
+                        rate_independent_LT_full_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_val)
+                    rate_independent_LT_full_zeta_nu_char_g_c___nu_chunk_list.append(
+                        rate_independent_LT_full_zeta_nu_char_g_c___nu_chunk_val)
+                    rate_independent_LT_full_zeta_nu_char_g_c__nu___nu_chunk_list.append(
+                        rate_independent_LT_full_zeta_nu_char_g_c__nu___nu_chunk_val)
+                    rate_independent_LT_full_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list.append(
+                        rate_independent_LT_full_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_val)
+                    rate_independent_LT_full_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list.append(
+                        rate_independent_LT_full_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_val)
+                    rate_independent_LT_full_zeta_nu_char_overline_g_c___nu_chunk_list.append(
+                        rate_independent_LT_full_zeta_nu_char_overline_g_c___nu_chunk_val)
+                    rate_independent_LT_full_zeta_nu_char_overline_g_c__nu___nu_chunk_list.append(
+                        rate_independent_LT_full_zeta_nu_char_overline_g_c__nu___nu_chunk_val)
 
-                    rate_independent_LT_inext_gaussian_g_c_crit___nu_chunk_list.append(rate_independent_LT_inext_gaussian_g_c_crit___nu_chunk_val)
-                    rate_independent_LT_inext_gaussian_g_c_crit__nu_squared___nu_chunk_list.append(rate_independent_LT_inext_gaussian_g_c_crit__nu_squared___nu_chunk_val)
-                    rate_independent_LT_inext_gaussian_overline_g_c_crit___nu_chunk_list.append(rate_independent_LT_inext_gaussian_overline_g_c_crit___nu_chunk_val)
-                    rate_independent_LT_inext_gaussian_overline_g_c_crit__nu_squared___nu_chunk_list.append(rate_independent_LT_inext_gaussian_overline_g_c_crit__nu_squared___nu_chunk_val)
+                    rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list.append(
+                        rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c___nu_chunk_val)
+                    rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list.append(
+                        rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_val)
+                    rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list.append(
+                        rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_val)
+                    rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list.append(
+                        rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_val)
+                    
+                    rate_independent_LT_quarter_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list.append(
+                        rate_independent_LT_quarter_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_val)
+                    rate_independent_LT_quarter_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list.append(
+                        rate_independent_LT_quarter_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_val)
+                    rate_independent_LT_quarter_zeta_nu_char_g_c___nu_chunk_list.append(
+                        rate_independent_LT_quarter_zeta_nu_char_g_c___nu_chunk_val)
+                    rate_independent_LT_quarter_zeta_nu_char_g_c__nu___nu_chunk_list.append(
+                        rate_independent_LT_quarter_zeta_nu_char_g_c__nu___nu_chunk_val)
+                    rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list.append(
+                        rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_val)
+                    rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list.append(
+                        rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_val)
+                    rate_independent_LT_quarter_zeta_nu_char_overline_g_c___nu_chunk_list.append(
+                        rate_independent_LT_quarter_zeta_nu_char_overline_g_c___nu_chunk_val)
+                    rate_independent_LT_quarter_zeta_nu_char_overline_g_c__nu___nu_chunk_list.append(
+                        rate_independent_LT_quarter_zeta_nu_char_overline_g_c__nu___nu_chunk_val)
 
-                    rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_diss_hat_crit___nu_chunk_list.append(rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_diss_hat_crit___nu_chunk_val)
-                    rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_diss_hat_crit___nu_chunk_list.append(rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_diss_hat_crit___nu_chunk_val)
-                    rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit___nu_chunk_list.append(rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit___nu_chunk_val)
-                    rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit__nu_squared___nu_chunk_list.append(rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit__nu_squared___nu_chunk_val)
-                    rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list.append(rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_diss_hat_crit___nu_chunk_val)
-                    rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_diss_hat_crit___nu_chunk_list.append(rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_diss_hat_crit___nu_chunk_val)
-                    rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit___nu_chunk_list.append(rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit___nu_chunk_val)
-                    rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit__nu_squared___nu_chunk_list.append(rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit__nu_squared___nu_chunk_val)
+                    rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list.append(
+                        rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c___nu_chunk_val)
+                    rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list.append(
+                        rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_val)
+                    rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list.append(
+                        rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_val)
+                    rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list.append(
+                        rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_val)
+
+                    rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_sci_hat_crit___nu_chunk_list.append(
+                        rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_sci_hat_crit___nu_chunk_val)
+                    rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_sci_hat_crit___nu_chunk_list.append(
+                        rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_sci_hat_crit___nu_chunk_val)
+                    rate_independent_beyer_2000_f_c_max_tau_b_g_c___nu_chunk_list.append(
+                        rate_independent_beyer_2000_f_c_max_tau_b_g_c___nu_chunk_val)
+                    rate_independent_beyer_2000_f_c_max_tau_b_g_c__nu___nu_chunk_list.append(
+                        rate_independent_beyer_2000_f_c_max_tau_b_g_c__nu___nu_chunk_val)
+                    rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list.append(
+                        rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_sci_hat_crit___nu_chunk_val)
+                    rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_sci_hat_crit___nu_chunk_list.append(
+                        rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_sci_hat_crit___nu_chunk_val)
+                    rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c___nu_chunk_list.append(
+                        rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c___nu_chunk_val)
+                    rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c__nu___nu_chunk_list.append(
+                        rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c__nu___nu_chunk_val)
+                    
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c___nu_chunk_list.append(
+                        rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c___nu_chunk_val)
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu___nu_chunk_list.append(
+                        rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu___nu_chunk_val)
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c___nu_chunk_list.append(
+                        rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c___nu_chunk_val)
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu___nu_chunk_list.append(
+                        rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu___nu_chunk_val)
             
             save_pickle_object(
                 self.savedir, A_nu___nu_chunk_list,
@@ -640,11 +1249,11 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
                 data_file_prefix+"-rate_independent_epsilon_c_diss_hat_crit___nu_chunk_list")
             save_pickle_object(
                 self.savedir,
-                rate_independent_g_c_crit___nu_chunk_list,
-                data_file_prefix+"-rate_independent_g_c_crit___nu_chunk_list")
+                rate_independent_g_c___nu_chunk_list,
+                data_file_prefix+"-rate_independent_g_c___nu_chunk_list")
             save_pickle_object(
-                self.savedir, rate_independent_g_c_crit__nu_squared___nu_chunk_list,
-                data_file_prefix+"-rate_independent_g_c_crit__nu_squared___nu_chunk_list")
+                self.savedir, rate_independent_g_c__nu___nu_chunk_list,
+                data_file_prefix+"-rate_independent_g_c__nu___nu_chunk_list")
             save_pickle_object(
                 self.savedir,
                 rate_independent_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list,
@@ -654,85 +1263,144 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
                 rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_list,
                 data_file_prefix+"-rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_list")
             save_pickle_object(
-                self.savedir, rate_independent_overline_g_c_crit___nu_chunk_list,
-                data_file_prefix+"-rate_independent_overline_g_c_crit___nu_chunk_list")
+                self.savedir, rate_independent_overline_g_c___nu_chunk_list,
+                data_file_prefix+"-rate_independent_overline_g_c___nu_chunk_list")
             save_pickle_object(
                 self.savedir,
-                rate_independent_overline_g_c_crit__nu_squared___nu_chunk_list,
-                data_file_prefix+"-rate_independent_overline_g_c_crit__nu_squared___nu_chunk_list")
+                rate_independent_overline_g_c__nu___nu_chunk_list,
+                data_file_prefix+"-rate_independent_overline_g_c__nu___nu_chunk_list")
             
             save_pickle_object(
-                self.savedir, rate_independent_LT_epsilon_cnu_diss_hat_crit___nu_chunk_list,
-                data_file_prefix+"-rate_independent_LT_epsilon_cnu_diss_hat_crit___nu_chunk_list")
+                self.savedir, rate_independent_LT_full_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list,
+                data_file_prefix+"-rate_independent_LT_full_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list")
             save_pickle_object(
-                self.savedir, rate_independent_LT_epsilon_c_diss_hat_crit___nu_chunk_list,
-                data_file_prefix+"-rate_independent_LT_epsilon_c_diss_hat_crit___nu_chunk_list")
+                self.savedir, rate_independent_LT_full_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list,
+                data_file_prefix+"-rate_independent_LT_full_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list")
             save_pickle_object(
-                self.savedir, rate_independent_LT_g_c_crit___nu_chunk_list,
-                data_file_prefix+"-rate_independent_LT_g_c_crit___nu_chunk_list")
+                self.savedir, rate_independent_LT_full_zeta_nu_char_g_c___nu_chunk_list,
+                data_file_prefix+"-rate_independent_LT_full_zeta_nu_char_g_c___nu_chunk_list")
             save_pickle_object(
-                self.savedir, rate_independent_LT_g_c_crit__nu_squared___nu_chunk_list,
-                data_file_prefix+"-rate_independent_LT_g_c_crit__nu_squared___nu_chunk_list")
-            save_pickle_object(
-                self.savedir,
-                rate_independent_LT_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list,
-                data_file_prefix+"-rate_independent_LT_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list")
+                self.savedir, rate_independent_LT_full_zeta_nu_char_g_c__nu___nu_chunk_list,
+                data_file_prefix+"-rate_independent_LT_full_zeta_nu_char_g_c__nu___nu_chunk_list")
             save_pickle_object(
                 self.savedir,
-                rate_independent_LT_overline_epsilon_c_diss_hat_crit___nu_chunk_list,
-                data_file_prefix+"-rate_independent_LT_overline_epsilon_c_diss_hat_crit___nu_chunk_list")
-            save_pickle_object(
-                self.savedir, rate_independent_LT_overline_g_c_crit___nu_chunk_list,
-                data_file_prefix+"-rate_independent_LT_overline_g_c_crit___nu_chunk_list")
+                rate_independent_LT_full_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list,
+                data_file_prefix+"-rate_independent_LT_full_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list")
             save_pickle_object(
                 self.savedir,
-                rate_independent_LT_overline_g_c_crit__nu_squared___nu_chunk_list,
-                data_file_prefix+"-rate_independent_LT_overline_g_c_crit__nu_squared___nu_chunk_list")
+                rate_independent_LT_full_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list,
+                data_file_prefix+"-rate_independent_LT_full_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list")
+            save_pickle_object(
+                self.savedir, rate_independent_LT_full_zeta_nu_char_overline_g_c___nu_chunk_list,
+                data_file_prefix+"-rate_independent_LT_full_zeta_nu_char_overline_g_c___nu_chunk_list")
+            save_pickle_object(
+                self.savedir,
+                rate_independent_LT_full_zeta_nu_char_overline_g_c__nu___nu_chunk_list,
+                data_file_prefix+"-rate_independent_LT_full_zeta_nu_char_overline_g_c__nu___nu_chunk_list")
             
             save_pickle_object(
-                self.savedir, rate_independent_LT_inext_gaussian_g_c_crit___nu_chunk_list,
-                data_file_prefix+"-rate_independent_LT_inext_gaussian_g_c_crit___nu_chunk_list")
+                self.savedir, rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list,
+                data_file_prefix+"-rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list")
             save_pickle_object(
                 self.savedir,
-                rate_independent_LT_inext_gaussian_g_c_crit__nu_squared___nu_chunk_list,
-                data_file_prefix+"-rate_independent_LT_inext_gaussian_g_c_crit__nu_squared___nu_chunk_list")
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list,
+                data_file_prefix+"-rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list")
             save_pickle_object(
                 self.savedir,
-                rate_independent_LT_inext_gaussian_overline_g_c_crit___nu_chunk_list,
-                data_file_prefix+"-rate_independent_LT_inext_gaussian_overline_g_c_crit___nu_chunk_list")
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list,
+                data_file_prefix+"-rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list")
             save_pickle_object(
                 self.savedir,
-                rate_independent_LT_inext_gaussian_overline_g_c_crit__nu_squared___nu_chunk_list,
-                data_file_prefix+"-rate_independent_LT_inext_gaussian_overline_g_c_crit__nu_squared___nu_chunk_list")
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list,
+                data_file_prefix+"-rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list")
             
             save_pickle_object(
-                self.savedir, rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_diss_hat_crit___nu_chunk_list,
-                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_diss_hat_crit___nu_chunk_list")
+                self.savedir, rate_independent_LT_quarter_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list,
+                data_file_prefix+"-rate_independent_LT_quarter_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list")
             save_pickle_object(
-                self.savedir, rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_diss_hat_crit___nu_chunk_list,
-                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_diss_hat_crit___nu_chunk_list")
+                self.savedir, rate_independent_LT_quarter_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list,
+                data_file_prefix+"-rate_independent_LT_quarter_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list")
             save_pickle_object(
-                self.savedir,
-                rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit___nu_chunk_list,
-                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit___nu_chunk_list")
+                self.savedir, rate_independent_LT_quarter_zeta_nu_char_g_c___nu_chunk_list,
+                data_file_prefix+"-rate_independent_LT_quarter_zeta_nu_char_g_c___nu_chunk_list")
             save_pickle_object(
-                self.savedir, rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit__nu_squared___nu_chunk_list,
-                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit__nu_squared___nu_chunk_list")
-            save_pickle_object(
-                self.savedir,
-                rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list,
-                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list")
+                self.savedir, rate_independent_LT_quarter_zeta_nu_char_g_c__nu___nu_chunk_list,
+                data_file_prefix+"-rate_independent_LT_quarter_zeta_nu_char_g_c__nu___nu_chunk_list")
             save_pickle_object(
                 self.savedir,
-                rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_diss_hat_crit___nu_chunk_list,
-                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_diss_hat_crit___nu_chunk_list")
-            save_pickle_object(
-                self.savedir, rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit___nu_chunk_list,
-                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit___nu_chunk_list")
+                rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list,
+                data_file_prefix+"-rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list")
             save_pickle_object(
                 self.savedir,
-                rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit__nu_squared___nu_chunk_list,
-                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit__nu_squared___nu_chunk_list")
+                rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list,
+                data_file_prefix+"-rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list")
+            save_pickle_object(
+                self.savedir, rate_independent_LT_quarter_zeta_nu_char_overline_g_c___nu_chunk_list,
+                data_file_prefix+"-rate_independent_LT_quarter_zeta_nu_char_overline_g_c___nu_chunk_list")
+            save_pickle_object(
+                self.savedir,
+                rate_independent_LT_quarter_zeta_nu_char_overline_g_c__nu___nu_chunk_list,
+                data_file_prefix+"-rate_independent_LT_quarter_zeta_nu_char_overline_g_c__nu___nu_chunk_list")
+            
+            save_pickle_object(
+                self.savedir, rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list,
+                data_file_prefix+"-rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list")
+            save_pickle_object(
+                self.savedir,
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list,
+                data_file_prefix+"-rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list")
+            save_pickle_object(
+                self.savedir,
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list,
+                data_file_prefix+"-rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list")
+            save_pickle_object(
+                self.savedir,
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list,
+                data_file_prefix+"-rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list")
+            
+            save_pickle_object(
+                self.savedir, rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_sci_hat_crit___nu_chunk_list,
+                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_sci_hat_crit___nu_chunk_list")
+            save_pickle_object(
+                self.savedir, rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_sci_hat_crit___nu_chunk_list,
+                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_sci_hat_crit___nu_chunk_list")
+            save_pickle_object(
+                self.savedir,
+                rate_independent_beyer_2000_f_c_max_tau_b_g_c___nu_chunk_list,
+                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_g_c___nu_chunk_list")
+            save_pickle_object(
+                self.savedir, rate_independent_beyer_2000_f_c_max_tau_b_g_c__nu___nu_chunk_list,
+                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_g_c__nu___nu_chunk_list")
+            save_pickle_object(
+                self.savedir,
+                rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list,
+                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list")
+            save_pickle_object(
+                self.savedir,
+                rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_sci_hat_crit___nu_chunk_list,
+                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_sci_hat_crit___nu_chunk_list")
+            save_pickle_object(
+                self.savedir, rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c___nu_chunk_list,
+                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c___nu_chunk_list")
+            save_pickle_object(
+                self.savedir,
+                rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c__nu___nu_chunk_list,
+                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c__nu___nu_chunk_list")
+            
+            save_pickle_object(
+                self.savedir,
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c___nu_chunk_list,
+                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c___nu_chunk_list")
+            save_pickle_object(
+                self.savedir, rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu___nu_chunk_list,
+                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu___nu_chunk_list")
+            save_pickle_object(
+                self.savedir, rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c___nu_chunk_list,
+                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c___nu_chunk_list")
+            save_pickle_object(
+                self.savedir,
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu___nu_chunk_list,
+                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu___nu_chunk_list")
         
         self.comm.Barrier()
         
@@ -747,22 +1415,22 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
         
         rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter = []
         rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter = []
-        rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit___nu_chunk_list_mpi_scatter = []
-        rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter = []
+        rate_dependent_frc_cntrld_AFM_exprmts_g_c___nu_chunk_list_mpi_scatter = []
+        rate_dependent_frc_cntrld_AFM_exprmts_g_c__nu___nu_chunk_list_mpi_scatter = []
         rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter = []
         rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter = []
-        rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_list_mpi_scatter = []
-        rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter = []
+        rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c___nu_chunk_list_mpi_scatter = []
+        rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_list_mpi_scatter = []
 
         for nu_val in nu_list_mpi_scatter:
             rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit = []
             rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit = []
-            rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit = []
-            rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit__nu_squared = []
+            rate_dependent_frc_cntrld_AFM_exprmts_g_c = []
+            rate_dependent_frc_cntrld_AFM_exprmts_g_c__nu = []
             rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit = []
             rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit = []
-            rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit = []
-            rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared = []
+            rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c = []
+            rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c__nu = []
 
             rate_dependent_single_chain = (
                 RateDependentScissionCompositeuFJC(nu=nu_val,
@@ -789,12 +1457,16 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
                 # Calculate results through applied chain force values
                 for f_c_indx in range(cp.f_c_num_steps):
                     t_val = t_steps[f_c_indx]
-                    xi_c_val = f_c_steps[f_c_indx] * beta * l_nu_eq # nN*nm/(nN*nm)
+                    xi_c_val = (
+                        f_c_steps[f_c_indx] * beta * l_nu_eq
+                    ) # nN*nm/(nN*nm)
                     lmbda_nu_val = (
-                        rate_dependent_single_chain.lmbda_nu_xi_c_hat_func(xi_c_val)
+                        rate_dependent_single_chain.lmbda_nu_xi_c_hat_func(
+                            xi_c_val)
                     )
                     p_nu_sci_hat_val = (
-                        rate_dependent_single_chain.p_nu_sci_hat_func(lmbda_nu_val)
+                        rate_dependent_single_chain.p_nu_sci_hat_func(
+                            lmbda_nu_val)
                     )
                     epsilon_cnu_sci_hat_val = (
                         rate_dependent_single_chain.epsilon_cnu_sci_hat_func(
@@ -813,7 +1485,8 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
                         epsilon_cnu_diss_hat_val = (
                             rate_dependent_single_chain.epsilon_cnu_diss_hat_func(
                                 p_nu_sci_hat_val, p_nu_sci_hat_cmltv_intgrl_val,
-                                epsilon_cnu_sci_hat_val, t_val, t_steps[f_c_indx-1],
+                                epsilon_cnu_sci_hat_val, t_val,
+                                t_steps[f_c_indx-1],
                                 epsilon_cnu_diss_hat_val_prior)
                         )
                     
@@ -827,10 +1500,10 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
                 epsilon_c_diss_hat_crit_val = (
                     nu_val * epsilon_cnu_diss_hat_crit_val
                 )
-                g_c_crit_val = (
-                    0.5 * A_nu_val * nu_val**2 * epsilon_cnu_diss_hat_crit_val
+                g_c_val = (
+                    0.5 * A_nu_val * nu_val * epsilon_cnu_diss_hat_crit_val
                 )
-                g_c_crit__nu_squared_val = (
+                g_c__nu_val = (
                     0.5 * A_nu_val * epsilon_cnu_diss_hat_crit_val
                 )
                 overline_epsilon_cnu_diss_hat_crit_val = (
@@ -839,85 +1512,86 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
                 overline_epsilon_c_diss_hat_crit_val = (
                     nu_val * overline_epsilon_cnu_diss_hat_crit_val
                 )
-                overline_g_c_crit_val = (
-                    0.5 * A_nu_val * nu_val**2
+                overline_g_c_val = (
+                    0.5 * A_nu_val * nu_val
                     * overline_epsilon_cnu_diss_hat_crit_val
                 )
-                overline_g_c_crit__nu_squared_val = (
+                overline_g_c__nu_val = (
                     0.5 * A_nu_val * overline_epsilon_cnu_diss_hat_crit_val
                 )
                 
                 rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit.append(
-                    epsilon_cnu_diss_hat_crit_val
-                )
+                    epsilon_cnu_diss_hat_crit_val)
                 rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit.append(
-                    epsilon_c_diss_hat_crit_val
-                )
-                rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit.append(g_c_crit_val)
-                rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit__nu_squared.append(
-                    g_c_crit__nu_squared_val
-                )
+                    epsilon_c_diss_hat_crit_val)
+                rate_dependent_frc_cntrld_AFM_exprmts_g_c.append(g_c_val)
+                rate_dependent_frc_cntrld_AFM_exprmts_g_c__nu.append(
+                    g_c__nu_val)
                 rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit.append(
-                    overline_epsilon_cnu_diss_hat_crit_val
-                )
+                    overline_epsilon_cnu_diss_hat_crit_val)
                 rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit.append(
-                    overline_epsilon_c_diss_hat_crit_val
-                )
-                rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit.append(
-                    overline_g_c_crit_val
-                )
-                rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared.append(
-                    overline_g_c_crit__nu_squared_val
-                )
+                    overline_epsilon_c_diss_hat_crit_val)
+                rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c.append(
+                    overline_g_c_val)
+                rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c__nu.append(
+                    overline_g_c__nu_val)
             
             rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter.append(
-                rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit
-            )
+                rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit)
             rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter.append(
-                rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit
-            )
-            rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit___nu_chunk_list_mpi_scatter.append(
-                rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit
-            )
-            rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter.append(
-                rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit__nu_squared
-            )
+                rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit)
+            rate_dependent_frc_cntrld_AFM_exprmts_g_c___nu_chunk_list_mpi_scatter.append(
+                rate_dependent_frc_cntrld_AFM_exprmts_g_c)
+            rate_dependent_frc_cntrld_AFM_exprmts_g_c__nu___nu_chunk_list_mpi_scatter.append(
+                rate_dependent_frc_cntrld_AFM_exprmts_g_c__nu)
             rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter.append(
-                rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit
-            )
+                rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit)
             rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter.append(
-                rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit
-            )
-            rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_list_mpi_scatter.append(
-                rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit
-            )
-            rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter.append(
-                rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared
-            )
+                rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit)
+            rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c___nu_chunk_list_mpi_scatter.append(
+                rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c)
+            rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_list_mpi_scatter.append(
+                rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c__nu)
         
-        rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_dependent_frc_cntrld_AFM_exprmts_g_c___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_dependent_frc_cntrld_AFM_exprmts_g_c___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter, root=0
+        rate_dependent_frc_cntrld_AFM_exprmts_g_c__nu___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_dependent_frc_cntrld_AFM_exprmts_g_c__nu___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter, root=0
+        rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_list_mpi_scatter,
+                root=0)
         )
         
         self.comm.Barrier()
@@ -928,22 +1602,22 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
         
         rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter = []
         rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter = []
-        rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit___nu_chunk_list_mpi_scatter = []
-        rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter = []
+        rate_dependent_strn_cntrld_AFM_exprmts_g_c___nu_chunk_list_mpi_scatter = []
+        rate_dependent_strn_cntrld_AFM_exprmts_g_c__nu___nu_chunk_list_mpi_scatter = []
         rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter = []
         rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter = []
-        rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_list_mpi_scatter = []
-        rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter = []
+        rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c___nu_chunk_list_mpi_scatter = []
+        rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_list_mpi_scatter = []
 
         for nu_val in nu_list_mpi_scatter:
             rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit = []
             rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit = []
-            rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit = []
-            rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit__nu_squared = []
+            rate_dependent_strn_cntrld_AFM_exprmts_g_c = []
+            rate_dependent_strn_cntrld_AFM_exprmts_g_c__nu = []
             rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit = []
             rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit = []
-            rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit = []
-            rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared = []
+            rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c = []
+            rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c__nu = []
 
             rate_dependent_single_chain = (
                 RateDependentScissionCompositeuFJC(nu=nu_val,
@@ -953,10 +1627,16 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
             )
             A_nu_val = rate_dependent_single_chain.A_nu
             lmbda_c_eq_crit_val = rate_dependent_single_chain.lmbda_c_eq_crit
-            lmbda_c_eq_steps = np.linspace(0, lmbda_c_eq_crit_val, cp.r_nu_num_steps)
+            lmbda_c_eq_steps = (
+                np.linspace(0, lmbda_c_eq_crit_val, cp.r_nu_num_steps)
+            )
             for r_nu_dot_val in cp.r_nu_dot_list:
-                lmbda_c_eq_dot_val = r_nu_dot_val / (nu_val*l_nu_eq) # (nm/sec)/nm = 1/sec
-                t_steps = lmbda_c_eq_steps / lmbda_c_eq_dot_val # 1/(1/sec) = sec
+                lmbda_c_eq_dot_val = (
+                    r_nu_dot_val / (nu_val*l_nu_eq)
+                ) # (nm/sec)/nm = 1/sec
+                t_steps = (
+                    lmbda_c_eq_steps / lmbda_c_eq_dot_val
+                ) # 1/(1/sec) = sec
 
                 # initialization
                 p_nu_sci_hat_cmltv_intgrl_val       = 0.
@@ -971,10 +1651,12 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
                     t_val = t_steps[r_nu_indx]
                     lmbda_c_eq_val = lmbda_c_eq_steps[r_nu_indx]
                     lmbda_nu_val = (
-                        rate_dependent_single_chain.lmbda_nu_func(lmbda_c_eq_val)
+                        rate_dependent_single_chain.lmbda_nu_func(
+                            lmbda_c_eq_val)
                     )
                     p_nu_sci_hat_val = (
-                        rate_dependent_single_chain.p_nu_sci_hat_func(lmbda_nu_val)
+                        rate_dependent_single_chain.p_nu_sci_hat_func(
+                            lmbda_nu_val)
                     )
                     epsilon_cnu_sci_hat_val = (
                         rate_dependent_single_chain.epsilon_cnu_sci_hat_func(
@@ -993,7 +1675,8 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
                         epsilon_cnu_diss_hat_val = (
                             rate_dependent_single_chain.epsilon_cnu_diss_hat_func(
                                 p_nu_sci_hat_val, p_nu_sci_hat_cmltv_intgrl_val,
-                                epsilon_cnu_sci_hat_val, t_val, t_steps[r_nu_indx-1],
+                                epsilon_cnu_sci_hat_val, t_val,
+                                t_steps[r_nu_indx-1],
                                 epsilon_cnu_diss_hat_val_prior)
                         )
                     
@@ -1007,10 +1690,10 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
                 epsilon_c_diss_hat_crit_val = (
                     nu_val * epsilon_cnu_diss_hat_crit_val
                 )
-                g_c_crit_val = (
-                    0.5 * A_nu_val * nu_val**2 * epsilon_cnu_diss_hat_crit_val
+                g_c_val = (
+                    0.5 * A_nu_val * nu_val * epsilon_cnu_diss_hat_crit_val
                 )
-                g_c_crit__nu_squared_val = (
+                g_c__nu_val = (
                     0.5 * A_nu_val * epsilon_cnu_diss_hat_crit_val
                 )
                 overline_epsilon_cnu_diss_hat_crit_val = (
@@ -1019,147 +1702,196 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
                 overline_epsilon_c_diss_hat_crit_val = (
                     nu_val * overline_epsilon_cnu_diss_hat_crit_val
                 )
-                overline_g_c_crit_val = (
-                    0.5 * A_nu_val * nu_val**2
+                overline_g_c_val = (
+                    0.5 * A_nu_val * nu_val
                     * overline_epsilon_cnu_diss_hat_crit_val
                 )
-                overline_g_c_crit__nu_squared_val = (
+                overline_g_c__nu_val = (
                     0.5 * A_nu_val * overline_epsilon_cnu_diss_hat_crit_val
                 )
                 
                 rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit.append(
-                    epsilon_cnu_diss_hat_crit_val
-                )
+                    epsilon_cnu_diss_hat_crit_val)
                 rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit.append(
-                    epsilon_c_diss_hat_crit_val
-                )
-                rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit.append(g_c_crit_val)
-                rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit__nu_squared.append(
-                    g_c_crit__nu_squared_val
-                )
+                    epsilon_c_diss_hat_crit_val)
+                rate_dependent_strn_cntrld_AFM_exprmts_g_c.append(g_c_val)
+                rate_dependent_strn_cntrld_AFM_exprmts_g_c__nu.append(
+                    g_c__nu_val)
                 rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit.append(
-                    overline_epsilon_cnu_diss_hat_crit_val
-                )
+                    overline_epsilon_cnu_diss_hat_crit_val)
                 rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit.append(
-                    overline_epsilon_c_diss_hat_crit_val
-                )
-                rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit.append(
-                    overline_g_c_crit_val
-                )
-                rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared.append(
-                    overline_g_c_crit__nu_squared_val
-                )
+                    overline_epsilon_c_diss_hat_crit_val)
+                rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c.append(
+                    overline_g_c_val)
+                rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c__nu.append(
+                    overline_g_c__nu_val)
             
             rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter.append(
-                rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit
-            )
+                rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit)
             rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter.append(
-                rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit
-            )
-            rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit___nu_chunk_list_mpi_scatter.append(
-                rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit
-            )
-            rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter.append(
-                rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit__nu_squared
-            )
+                rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit)
+            rate_dependent_strn_cntrld_AFM_exprmts_g_c___nu_chunk_list_mpi_scatter.append(
+                rate_dependent_strn_cntrld_AFM_exprmts_g_c)
+            rate_dependent_strn_cntrld_AFM_exprmts_g_c__nu___nu_chunk_list_mpi_scatter.append(
+                rate_dependent_strn_cntrld_AFM_exprmts_g_c__nu)
             rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter.append(
-                rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit
-            )
+                rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit)
             rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter.append(
-                rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit
-            )
-            rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_list_mpi_scatter.append(
-                rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit
-            )
-            rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter.append(
-                rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared
-            )
+                rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit)
+            rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c___nu_chunk_list_mpi_scatter.append(
+                rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c)
+            rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_list_mpi_scatter.append(
+                rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c__nu)
         
-        rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_dependent_strn_cntrld_AFM_exprmts_g_c___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_dependent_strn_cntrld_AFM_exprmts_g_c___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter, root=0
+        rate_dependent_strn_cntrld_AFM_exprmts_g_c__nu___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_dependent_strn_cntrld_AFM_exprmts_g_c__nu___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_list_mpi_scatter, root=0
+        rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c___nu_chunk_list_mpi_scatter,
+                root=0)
         )
-        rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_split = self.comm.gather(
-            rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_scatter, root=0
+        rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_list_mpi_split = (
+            self.comm.gather(
+                rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_list_mpi_scatter,
+                root=0)
         )
         
         self.comm.Barrier()
-        
+
         if self.comm_rank == 0:
             print("Post-processing rate-dependent calculations")
 
             rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list = []
             rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list = []
-            rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit___nu_chunk_list = []
-            rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_list = []
+            rate_dependent_frc_cntrld_AFM_exprmts_g_c___nu_chunk_list = []
+            rate_dependent_frc_cntrld_AFM_exprmts_g_c__nu___nu_chunk_list = []
             rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list = []
             rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list = []
-            rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_list = []
-            rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_list = []
+            rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c___nu_chunk_list = []
+            rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_list = []
 
             rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list = []
             rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list = []
-            rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit___nu_chunk_list = []
-            rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_list = []
+            rate_dependent_strn_cntrld_AFM_exprmts_g_c___nu_chunk_list = []
+            rate_dependent_strn_cntrld_AFM_exprmts_g_c__nu___nu_chunk_list = []
             rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list = []
             rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list = []
-            rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_list = []
-            rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_list = []
+            rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c___nu_chunk_list = []
+            rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_list = []
 
             for proc_indx in range(self.comm_size):
                 for nu_chunk_indx in range(cp.nu_num_list_mpi_split[proc_indx]):
-                    rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_val = rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_val = rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit___nu_chunk_val = rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_val = rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_val = rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_val = rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_val = rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_val = rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_val = (
+                        rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_val = (
+                        rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_dependent_frc_cntrld_AFM_exprmts_g_c___nu_chunk_val = (
+                        rate_dependent_frc_cntrld_AFM_exprmts_g_c___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_dependent_frc_cntrld_AFM_exprmts_g_c__nu___nu_chunk_val = (
+                        rate_dependent_frc_cntrld_AFM_exprmts_g_c__nu___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_val = (
+                        rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_val = (
+                        rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c___nu_chunk_val = (
+                        rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_val = (
+                        rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
 
-                    rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_val = rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_val = rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit___nu_chunk_val = rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_val = rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_val = rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_val = rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_val = rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
-                    rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_val = rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_val = (
+                        rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_val = (
+                        rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_dependent_strn_cntrld_AFM_exprmts_g_c___nu_chunk_val = (
+                        rate_dependent_strn_cntrld_AFM_exprmts_g_c___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_dependent_strn_cntrld_AFM_exprmts_g_c__nu___nu_chunk_val = (
+                        rate_dependent_strn_cntrld_AFM_exprmts_g_c__nu___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_val = (
+                        rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_val = (
+                        rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c___nu_chunk_val = (
+                        rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
+                    rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_val = (
+                        rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_list_mpi_split[proc_indx][nu_chunk_indx]
+                    )
 
-                    rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list.append(rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_val)
-                    rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list.append(rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_val)
-                    rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit___nu_chunk_list.append(rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit___nu_chunk_val)
-                    rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_list.append(rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_val)
-                    rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list.append(rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_val)
-                    rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list.append(rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_val)
-                    rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_list.append(rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_val)
-                    rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_list.append(rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_val)
+                    rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list.append(
+                        rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_val)
+                    rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list.append(
+                        rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_val)
+                    rate_dependent_frc_cntrld_AFM_exprmts_g_c___nu_chunk_list.append(
+                        rate_dependent_frc_cntrld_AFM_exprmts_g_c___nu_chunk_val)
+                    rate_dependent_frc_cntrld_AFM_exprmts_g_c__nu___nu_chunk_list.append(
+                        rate_dependent_frc_cntrld_AFM_exprmts_g_c__nu___nu_chunk_val)
+                    rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list.append(
+                        rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_val)
+                    rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list.append(
+                        rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_val)
+                    rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c___nu_chunk_list.append(
+                        rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c___nu_chunk_val)
+                    rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_list.append(
+                        rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_val)
 
-                    rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list.append(rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_val)
-                    rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list.append(rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_val)
-                    rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit___nu_chunk_list.append(rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit___nu_chunk_val)
-                    rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_list.append(rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_val)
-                    rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list.append(rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_val)
-                    rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list.append(rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_val)
-                    rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_list.append(rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_val)
-                    rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_list.append(rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_val)
+                    rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list.append(
+                        rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_val)
+                    rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list.append(
+                        rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_val)
+                    rate_dependent_strn_cntrld_AFM_exprmts_g_c___nu_chunk_list.append(
+                        rate_dependent_strn_cntrld_AFM_exprmts_g_c___nu_chunk_val)
+                    rate_dependent_strn_cntrld_AFM_exprmts_g_c__nu___nu_chunk_list.append(
+                        rate_dependent_strn_cntrld_AFM_exprmts_g_c__nu___nu_chunk_val)
+                    rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list.append(
+                        rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_val)
+                    rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list.append(
+                        rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_val)
+                    rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c___nu_chunk_list.append(
+                        rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c___nu_chunk_val)
+                    rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_list.append(
+                        rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_val)
             
             save_pickle_object(
                 self.savedir,
@@ -1170,12 +1902,12 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
                 rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list,
                 data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list")
             save_pickle_object(
-                self.savedir, rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit___nu_chunk_list,
-                data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit___nu_chunk_list")
+                self.savedir, rate_dependent_frc_cntrld_AFM_exprmts_g_c___nu_chunk_list,
+                data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_g_c___nu_chunk_list")
             save_pickle_object(
                 self.savedir,
-                rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_list,
-                data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_list")
+                rate_dependent_frc_cntrld_AFM_exprmts_g_c__nu___nu_chunk_list,
+                data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_g_c__nu___nu_chunk_list")
             save_pickle_object(
                 self.savedir,
                 rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list,
@@ -1186,12 +1918,12 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
                 data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list")
             save_pickle_object(
                 self.savedir,
-                rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_list,
-                data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_list")
+                rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c___nu_chunk_list,
+                data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c___nu_chunk_list")
             save_pickle_object(
                 self.savedir,
-                rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_list,
-                data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_list")
+                rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_list,
+                data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_list")
             
             save_pickle_object(
                 self.savedir,
@@ -1202,12 +1934,12 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
                 rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list,
                 data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list")
             save_pickle_object(
-                self.savedir, rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit___nu_chunk_list,
-                data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit___nu_chunk_list")
+                self.savedir, rate_dependent_strn_cntrld_AFM_exprmts_g_c___nu_chunk_list,
+                data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_g_c___nu_chunk_list")
             save_pickle_object(
                 self.savedir,
-                rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_list,
-                data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_list")
+                rate_dependent_strn_cntrld_AFM_exprmts_g_c__nu___nu_chunk_list,
+                data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_g_c__nu___nu_chunk_list")
             save_pickle_object(
                 self.savedir,
                 rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list,
@@ -1218,13 +1950,12 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
                 data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list")
             save_pickle_object(
                 self.savedir,
-                rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_list,
-                data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_list")
+                rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c___nu_chunk_list,
+                data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c___nu_chunk_list")
             save_pickle_object(
                 self.savedir,
-                rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_list,
-                data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_list")
-
+                rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_list,
+                data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_list")
 
     def finalization(self):
         """Define finalization analysis"""
@@ -1249,169 +1980,460 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
         
         if self.comm_rank == 0:
             print("Plotting")
+
+            A_nu___nu_chunk_list = load_pickle_object(
+                self.savedir,
+                data_file_prefix+"-A_nu___nu_chunk_list")
+            inext_gaussian_A_nu___nu_chunk_list = load_pickle_object(
+                self.savedir,
+                data_file_prefix+"-inext_gaussian_A_nu___nu_chunk_list")
+            inext_gaussian_A_nu_err___nu_chunk_list = load_pickle_object(
+                self.savedir,
+                data_file_prefix+"-inext_gaussian_A_nu_err___nu_chunk_list")
             
-            rate_independent_epsilon_cnu_diss_hat_crit___nu_chunk_list = load_pickle_object(
+            rate_independent_epsilon_cnu_diss_hat_crit___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_epsilon_cnu_diss_hat_crit___nu_chunk_list")
+            )
+            rate_independent_epsilon_c_diss_hat_crit___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_epsilon_c_diss_hat_crit___nu_chunk_list")
+            )
+            rate_independent_g_c___nu_chunk_list = load_pickle_object(
                 self.savedir,
-                data_file_prefix+"-rate_independent_epsilon_cnu_diss_hat_crit___nu_chunk_list")
-            rate_independent_epsilon_c_diss_hat_crit___nu_chunk_list = load_pickle_object(
+                data_file_prefix+"-rate_independent_g_c___nu_chunk_list")
+            rate_independent_g_c__nu___nu_chunk_list = load_pickle_object(
                 self.savedir,
-                data_file_prefix+"-rate_independent_epsilon_c_diss_hat_crit___nu_chunk_list")
-            rate_independent_g_c_crit___nu_chunk_list = load_pickle_object(
+                data_file_prefix+"-rate_independent_g_c__nu___nu_chunk_list")
+            rate_independent_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list")
+            )
+            rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_list")
+            )
+            rate_independent_overline_g_c___nu_chunk_list = load_pickle_object(
                 self.savedir,
-                data_file_prefix+"-rate_independent_g_c_crit___nu_chunk_list")
-            rate_independent_g_c_crit__nu_squared___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_g_c_crit__nu_squared___nu_chunk_list")
-            rate_independent_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list")
-            rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_list")
-            rate_independent_overline_g_c_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_overline_g_c_crit___nu_chunk_list")
-            rate_independent_overline_g_c_crit__nu_squared___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_overline_g_c_crit__nu_squared___nu_chunk_list")
+                data_file_prefix+"-rate_independent_overline_g_c___nu_chunk_list")
+            rate_independent_overline_g_c__nu___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_overline_g_c__nu___nu_chunk_list")
+            )
             
-            rate_independent_LT_epsilon_cnu_diss_hat_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_LT_epsilon_cnu_diss_hat_crit___nu_chunk_list")
-            rate_independent_LT_epsilon_c_diss_hat_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_LT_epsilon_c_diss_hat_crit___nu_chunk_list")
-            rate_independent_LT_g_c_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_LT_g_c_crit___nu_chunk_list")
-            rate_independent_LT_g_c_crit__nu_squared___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_LT_g_c_crit__nu_squared___nu_chunk_list")
-            rate_independent_LT_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_LT_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list")
-            rate_independent_LT_overline_epsilon_c_diss_hat_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_LT_overline_epsilon_c_diss_hat_crit___nu_chunk_list")
-            rate_independent_LT_overline_g_c_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_LT_overline_g_c_crit___nu_chunk_list")
-            rate_independent_LT_overline_g_c_crit__nu_squared___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_LT_overline_g_c_crit__nu_squared___nu_chunk_list")
-            
-            rate_independent_LT_inext_gaussian_g_c_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_LT_inext_gaussian_g_c_crit___nu_chunk_list")
-            rate_independent_LT_inext_gaussian_g_c_crit__nu_squared___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_LT_inext_gaussian_g_c_crit__nu_squared___nu_chunk_list")
-            rate_independent_LT_inext_gaussian_overline_g_c_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_LT_inext_gaussian_overline_g_c_crit___nu_chunk_list")
-            rate_independent_LT_inext_gaussian_overline_g_c_crit__nu_squared___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_LT_inext_gaussian_overline_g_c_crit__nu_squared___nu_chunk_list")
-            
-            rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_diss_hat_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_diss_hat_crit___nu_chunk_list")
-            rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_diss_hat_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_diss_hat_crit___nu_chunk_list")
-            rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit___nu_chunk_list")
-            rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit__nu_squared___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit__nu_squared___nu_chunk_list")
-            rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list")
-            rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_diss_hat_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_diss_hat_crit___nu_chunk_list")
-            rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit___nu_chunk_list")
-            rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit__nu_squared___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit__nu_squared___nu_chunk_list")
-            
-            rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list")
-            rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list")
-            rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit___nu_chunk_list")
-            rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_list")
-            rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list")
-            rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list")
-            rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_list")
-            rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_list")
-            
-            rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list")
-            rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list")
-            rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit___nu_chunk_list")
-            rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_list")
-            rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list")
-            rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list")
-            rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_list")
-            rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_list = load_pickle_object(
-                self.savedir,
-                data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_list")
+            rate_independent_LT_full_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_LT_full_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list")
+            )
+            rate_independent_LT_full_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_LT_full_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list")
+            )
+            rate_independent_LT_full_zeta_nu_char_g_c___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_LT_full_zeta_nu_char_g_c___nu_chunk_list")
+            )
+            rate_independent_LT_full_zeta_nu_char_g_c__nu___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_LT_full_zeta_nu_char_g_c__nu___nu_chunk_list")
+            )
+            rate_independent_LT_full_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_LT_full_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list")
+            )
+            rate_independent_LT_full_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_LT_full_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list")
+            )
+            rate_independent_LT_full_zeta_nu_char_overline_g_c___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_LT_full_zeta_nu_char_overline_g_c___nu_chunk_list")
+            )
+            rate_independent_LT_full_zeta_nu_char_overline_g_c__nu___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_LT_full_zeta_nu_char_overline_g_c__nu___nu_chunk_list")
+            )
+
+            rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list")
+            )
+            rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list")
+            )
+            rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list")
+            )
+            rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list")
+            )
+
+            rate_independent_LT_quarter_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_LT_quarter_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list")
+            )
+            rate_independent_LT_quarter_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_LT_quarter_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list")
+            )
+            rate_independent_LT_quarter_zeta_nu_char_g_c___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_LT_quarter_zeta_nu_char_g_c___nu_chunk_list")
+            )
+            rate_independent_LT_quarter_zeta_nu_char_g_c__nu___nu_chunk_list = (
+                    load_pickle_object(
+                    self.savedir,
+                data_file_prefix+"-rate_independent_LT_quarter_zeta_nu_char_g_c__nu___nu_chunk_list")
+            )
+            rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list")
+            )
+            rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list")
+            )
+            rate_independent_LT_quarter_zeta_nu_char_overline_g_c___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_LT_quarter_zeta_nu_char_overline_g_c___nu_chunk_list")
+            )
+            rate_independent_LT_quarter_zeta_nu_char_overline_g_c__nu___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_LT_quarter_zeta_nu_char_overline_g_c__nu___nu_chunk_list")
+            )
+
+            rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list")
+            )
+            rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list")
+            )
+            rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list")
+            )
+            rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list")
+            )
+
+            rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_sci_hat_crit___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_sci_hat_crit___nu_chunk_list")
+            )
+            rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_sci_hat_crit___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_sci_hat_crit___nu_chunk_list")
+            )
+            rate_independent_beyer_2000_f_c_max_tau_b_g_c___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_g_c___nu_chunk_list")
+            )
+            rate_independent_beyer_2000_f_c_max_tau_b_g_c__nu___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_g_c__nu___nu_chunk_list")
+            )
+            rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list")
+            )
+            rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_sci_hat_crit___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_sci_hat_crit___nu_chunk_list")
+            )
+            rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c___nu_chunk_list")
+            )
+            rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c__nu___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c__nu___nu_chunk_list")
+            )
+
+            rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c___nu_chunk_list")
+            )
+            rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu___nu_chunk_list")
+            )
+            rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c___nu_chunk_list")
+            )
+            rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu___nu_chunk_list")
+            )
+
+            rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list")
+            )
+            rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list")
+            )
+            rate_dependent_frc_cntrld_AFM_exprmts_g_c___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_g_c___nu_chunk_list")
+            )
+            rate_dependent_frc_cntrld_AFM_exprmts_g_c__nu___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_g_c__nu___nu_chunk_list")
+            )
+            rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list")
+            )
+            rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list")
+            )
+            rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c___nu_chunk_list")
+            )
+            rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_list")
+            )
+
+            rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list")
+            )
+            rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list")
+            )
+            rate_dependent_strn_cntrld_AFM_exprmts_g_c___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_g_c___nu_chunk_list")
+            )
+            rate_dependent_strn_cntrld_AFM_exprmts_g_c__nu___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_g_c__nu___nu_chunk_list")
+            )
+            rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list")
+            )
+            rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list")
+            )
+            rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c___nu_chunk_list")
+            )
+            rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_list = (
+                load_pickle_object(
+                    self.savedir,
+                    data_file_prefix+"-rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_list")
+            )
 
             # plot results
             latex_formatting_figure(ppp)
 
+            fig, (ax1, ax2) = plt.subplots(
+                2, 1, gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
+            
+            ax1.semilogx(
+                cp.nu_list, A_nu___nu_chunk_list,
+                linestyle=cp.cufjc_A_nu_linestyle,
+                color='blue', alpha=1, linewidth=2.5,
+                label=r'$\textrm{c}u\textrm{FJC scission}$')
+            ax1.semilogx(
+                cp.nu_list, inext_gaussian_A_nu___nu_chunk_list,
+                linestyle=cp.inext_gaussian_A_nu_linestyle,
+                color='red', alpha=1, linewidth=2.5,
+                label=r'$\textrm{inextensible Gaussian chain}$')
+            ax1.legend(loc='best', fontsize=14)
+            ax1.tick_params(axis='y', labelsize=20)
+            ax1.set_ylabel(r'$\mathcal{A}_{\nu}$', fontsize=30)
+            ax1.grid(True, alpha=0.25)
+            
+            ax2.loglog(
+                cp.nu_list, inext_gaussian_A_nu_err___nu_chunk_list,
+                linestyle='-', color='blue', alpha=1, linewidth=2.5)
+            ax2.tick_params(axis='y', labelsize=20)
+            ax2.set_ylabel(r'$\%~\textrm{error}$', fontsize=30)
+            ax2.grid(True, alpha=0.25)
+            
+            plt.xticks(fontsize=20)
+            plt.xlabel(r'$\nu$', fontsize=30)
+            save_current_figure_no_labels(
+                self.savedir,
+                data_file_prefix+"-A_nu-cufjc-igc-comparison")
+
+            fig = plt.figure()
+            fig_legend = plt.figure()
+            ax = fig.add_subplot(111)
+            ax.plot(
+                [], [], linestyle=cp.LT_full_zeta_nu_char_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_overline_full_zeta_nu_char_label)
+            ax.plot(
+                [], [], linestyle=cp.LT_quarter_zeta_nu_char_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_overline_quarter_zeta_nu_char_label)
+            for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
+                ax.plot(
+                    [], [],
+                    linestyle=cp.beyer_2000_tau_b_linestyle_list[AFM_expermts_indx],
+                    color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
+                    alpha=1, linewidth=2.5,
+                    label=cp.beyer_2000_tau_b_overline_label_list[AFM_expermts_indx])
+            ax.plot(
+                [], [],
+                linestyle=cp.cufjc_linestyle, color=cp.cufjc_color,
+                alpha=1, linewidth=2.5, label=cp.cufjc_overline_label)
+            for f_c_dot_indx in range(cp.f_c_dot_num):
+                ax.plot(
+                    [], [],
+                    linestyle=cp.f_c_dot_linestyle_list[f_c_dot_indx],
+                    color=cp.f_c_dot_color_list[f_c_dot_indx],
+                    alpha=1, linewidth=2.5,
+                    label=cp.f_c_dot_overline_label_list[f_c_dot_indx])
+            fig_legend.legend(
+                ax.get_legend_handles_labels()[0],
+                ax.get_legend_handles_labels()[1],
+                loc='center', fontsize=20)
+            fig_legend.savefig(
+                self.savedir+data_file_prefix+"-force-control-main-text-legend"+".pdf",
+                transparent=True)
+            plt.close()
+
+            fig = plt.figure()
+            fig_legend = plt.figure()
+            ax = fig.add_subplot(111)
+            ax.plot(
+                [], [], linestyle=cp.LT_full_zeta_nu_char_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_full_zeta_nu_char_label)
+            ax.plot(
+                [], [], linestyle=cp.LT_quarter_zeta_nu_char_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_quarter_zeta_nu_char_label)
+            for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
+                ax.plot(
+                    [], [],
+                    linestyle=cp.beyer_2000_tau_b_linestyle_list[AFM_expermts_indx],
+                    color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
+                    alpha=1, linewidth=2.5,
+                    label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
+            ax.plot(
+                [], [],
+                linestyle=cp.cufjc_linestyle, color=cp.cufjc_color,
+                alpha=1, linewidth=2.5, label=cp.cufjc_label)
+            for f_c_dot_indx in range(cp.f_c_dot_num):
+                ax.plot(
+                    [], [],
+                    linestyle=cp.f_c_dot_linestyle_list[f_c_dot_indx],
+                    color=cp.f_c_dot_color_list[f_c_dot_indx],
+                    alpha=1, linewidth=2.5,
+                    label=cp.f_c_dot_label_list[f_c_dot_indx])
+            fig_legend.legend(
+                ax.get_legend_handles_labels()[0],
+                ax.get_legend_handles_labels()[1],
+                loc='center', fontsize=20)
+            fig_legend.savefig(
+                self.savedir+data_file_prefix+"-force-control-supporting-information-legend"+".pdf",
+                transparent=True)
+            plt.close()
+
             fig = plt.figure()
             plt.semilogx(
-                cp.nu_list, rate_independent_LT_epsilon_cnu_diss_hat_crit___nu_chunk_list,
-                linestyle='-', color='red', alpha=1, linewidth=2.5,
-                label=cp.LT_label)
+                cp.nu_list,
+                rate_independent_LT_full_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list,
+                linestyle=cp.LT_full_zeta_nu_char_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_full_zeta_nu_char_label)
+            plt.semilogx(
+                cp.nu_list,
+                rate_independent_LT_quarter_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list,
+                linestyle=cp.LT_quarter_zeta_nu_char_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_quarter_zeta_nu_char_label)
             for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
-                rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_diss_hat_crit_list = [
-                    rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_diss_hat_crit___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
+                rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_sci_hat_crit_list = [
+                    rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_sci_hat_crit___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
                     for nu_chunk_indx in range(cp.nu_num)
                 ]
                 plt.semilogx(
                     cp.nu_list,
-                    rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_diss_hat_crit_list,
+                    rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_sci_hat_crit_list,
                     linestyle=cp.beyer_2000_tau_b_linestyle_list[AFM_expermts_indx],
                     color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
                     alpha=1, linewidth=2.5,
                     label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
             plt.semilogx(
-                cp.nu_list, rate_independent_epsilon_cnu_diss_hat_crit___nu_chunk_list,
-                linestyle='-', color='blue', alpha=1, linewidth=2.5,
-                label=cp.ufjc_label)
+                cp.nu_list,
+                rate_independent_epsilon_cnu_diss_hat_crit___nu_chunk_list,
+                linestyle=cp.cufjc_linestyle, color=cp.cufjc_color,
+                alpha=1, linewidth=2.5, label=cp.cufjc_label)
             for f_c_dot_indx in range(cp.f_c_dot_num):
                 rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit_list = [
                     rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list[nu_chunk_indx][f_c_dot_indx]
@@ -1420,40 +2442,50 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
                 plt.semilogx(
                     cp.nu_list,
                     rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit_list,
-                    linestyle='-', color=cp.f_c_dot_color_list[f_c_dot_indx],
+                    linestyle=cp.f_c_dot_linestyle_list[f_c_dot_indx],
+                    color=cp.f_c_dot_color_list[f_c_dot_indx],
                     alpha=1, linewidth=2.5,
                     label=cp.f_c_dot_label_list[f_c_dot_indx])
-            plt.legend(loc='best', fontsize=10)
+            # plt.legend(loc='best', fontsize=12)
             plt.ylim([-5, zeta_nu_char+5])
-            plt.yticks(fontsize=16)
-            plt.xticks(fontsize=16)
+            plt.yticks(fontsize=20)
+            plt.xticks(fontsize=20)
             plt.grid(True, alpha=0.25)
             save_current_figure(
-                self.savedir, r'$\nu$', 20,
-                r'$\hat{\varepsilon}_{c\nu}^{diss}$', 20,
-                data_file_prefix+"-rate-independent-and-rate-dependent-force-controlled-nondimensional-dissipated-chain-scission-energy-per-segment-vs-nu")
+                self.savedir, r'$\nu$', 30,
+                r'$(\hat{\varepsilon}_{c\nu}^{sci})^{crit},~(\hat{\varepsilon}_{c\nu}^{diss})^{crit}$', 30,
+                data_file_prefix+"-force-control-nondim-crit-diss-chain-scission-energy-per-segment-vs-nu")
             
             fig = plt.figure()
             plt.semilogx(
-                cp.nu_list, rate_independent_LT_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list,
-                linestyle='-', color='red', alpha=1, linewidth=2.5,
-                label=cp.LT_label)
+                cp.nu_list,
+                rate_independent_LT_full_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list,
+                linestyle=cp.LT_full_zeta_nu_char_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_overline_full_zeta_nu_char_label)
+            plt.semilogx(
+                cp.nu_list,
+                rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list,
+                linestyle=cp.LT_quarter_zeta_nu_char_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_overline_quarter_zeta_nu_char_label)
             for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
-                rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_diss_hat_crit_list = [
-                    rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
+                rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_sci_hat_crit_list = [
+                    rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
                     for nu_chunk_indx in range(cp.nu_num)
                 ]
                 plt.semilogx(
                     cp.nu_list,
-                    rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_diss_hat_crit_list,
+                    rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_sci_hat_crit_list,
                     linestyle=cp.beyer_2000_tau_b_linestyle_list[AFM_expermts_indx],
                     color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
                     alpha=1, linewidth=2.5,
-                    label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
+                    label=cp.beyer_2000_tau_b_overline_label_list[AFM_expermts_indx])
             plt.semilogx(
-                cp.nu_list, rate_independent_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list,
-                linestyle='-', color='blue', alpha=1, linewidth=2.5,
-                label=cp.ufjc_label)
+                cp.nu_list,
+                rate_independent_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list,
+                linestyle=cp.cufjc_linestyle, color=cp.cufjc_color,
+                alpha=1, linewidth=2.5, label=cp.cufjc_overline_label)
             for f_c_dot_indx in range(cp.f_c_dot_num):
                 rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit_list = [
                     rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list[nu_chunk_indx][f_c_dot_indx]
@@ -1462,40 +2494,50 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
                 plt.semilogx(
                     cp.nu_list,
                     rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit_list,
-                    linestyle='-', color=cp.f_c_dot_color_list[f_c_dot_indx],
+                    linestyle=cp.f_c_dot_linestyle_list[f_c_dot_indx],
+                    color=cp.f_c_dot_color_list[f_c_dot_indx],
                     alpha=1, linewidth=2.5,
-                    label=cp.f_c_dot_label_list[f_c_dot_indx])
-            plt.legend(loc='best', fontsize=10)
-            plt.ylim([-0.05, 1.025])
-            plt.yticks(fontsize=16)
-            plt.xticks(fontsize=16)
+                    label=cp.f_c_dot_overline_label_list[f_c_dot_indx])
+            # plt.legend(loc='best', fontsize=12)
+            plt.ylim([-0.015, 1.015])
+            plt.yticks(fontsize=20)
+            plt.xticks(fontsize=20)
             plt.grid(True, alpha=0.25)
             save_current_figure(
-                self.savedir, r'$\nu$', 20,
-                r'$\overline{\hat{\varepsilon}_{c\nu}^{diss}}$', 20,
-                data_file_prefix+"-rate-independent-and-rate-dependent-force-controlled-nondimensional-scaled-dissipated-chain-scission-energy-per-segment-vs-nu")
+                self.savedir, r'$\nu$', 30,
+                r'$\overline{(\hat{\varepsilon}_{c\nu}^{sci})^{crit}},~\overline{(\hat{\varepsilon}_{c\nu}^{diss})^{crit}}$', 30,
+                data_file_prefix+"-force-control-nondim-scaled-crit-diss-chain-scission-energy-per-segment-vs-nu")
             
             fig = plt.figure()
             plt.loglog(
-                cp.nu_list, rate_independent_LT_epsilon_c_diss_hat_crit___nu_chunk_list,
-                linestyle='-', color='red', alpha=1, linewidth=2.5,
-                label=cp.LT_label)
+                cp.nu_list,
+                rate_independent_LT_full_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list,
+                linestyle=cp.LT_full_zeta_nu_char_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_full_zeta_nu_char_label)
+            plt.semilogx(
+                cp.nu_list,
+                rate_independent_LT_quarter_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list,
+                linestyle=cp.LT_quarter_zeta_nu_char_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_quarter_zeta_nu_char_label)
             for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
-                rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_diss_hat_crit_list = [
-                    rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_diss_hat_crit___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
+                rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_sci_hat_crit_list = [
+                    rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_sci_hat_crit___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
                     for nu_chunk_indx in range(cp.nu_num)
                 ]
                 plt.semilogx(
                     cp.nu_list,
-                    rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_diss_hat_crit_list,
+                    rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_sci_hat_crit_list,
                     linestyle=cp.beyer_2000_tau_b_linestyle_list[AFM_expermts_indx],
                     color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
                     alpha=1, linewidth=2.5,
                     label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
             plt.loglog(
-                cp.nu_list, rate_independent_epsilon_c_diss_hat_crit___nu_chunk_list,
-                linestyle='-', color='blue', alpha=1, linewidth=2.5,
-                label=cp.ufjc_label)
+                cp.nu_list,
+                rate_independent_epsilon_c_diss_hat_crit___nu_chunk_list,
+                linestyle=cp.cufjc_linestyle, color=cp.cufjc_color,
+                alpha=1, linewidth=2.5, label=cp.cufjc_label)
             for f_c_dot_indx in range(cp.f_c_dot_num):
                 rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit_list = [
                     rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list[nu_chunk_indx][f_c_dot_indx]
@@ -1504,40 +2546,50 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
                 plt.loglog(
                     cp.nu_list,
                     rate_dependent_frc_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit_list,
-                    linestyle='-', color=cp.f_c_dot_color_list[f_c_dot_indx],
+                    linestyle=cp.f_c_dot_linestyle_list[f_c_dot_indx],
+                    color=cp.f_c_dot_color_list[f_c_dot_indx],
                     alpha=1, linewidth=2.5,
                     label=cp.f_c_dot_label_list[f_c_dot_indx])
-            plt.legend(loc='best', fontsize=10)
+            # plt.legend(loc='best', fontsize=12)
             # plt.ylim([-5, zeta_nu_char+5])
-            plt.yticks(fontsize=16)
-            plt.xticks(fontsize=16)
+            plt.yticks(fontsize=20)
+            plt.xticks(fontsize=20)
             plt.grid(True, alpha=0.25)
             save_current_figure(
-                self.savedir, r'$\nu$', 20,
-                r'$\hat{\varepsilon}_c^{diss}$', 20,
-                data_file_prefix+"-rate-independent-and-rate-dependent-force-controlled-nondimensional-dissipated-chain-scission-energy-vs-nu")
+                self.savedir, r'$\nu$', 30,
+                r'$(\hat{\varepsilon}_c^{sci})^{crit},~(\hat{\varepsilon}_c^{diss})^{crit}$', 30,
+                data_file_prefix+"-force-control-nondim-crit-diss-chain-scission-energy-vs-nu")
             
             fig = plt.figure()
             plt.loglog(
-                cp.nu_list, rate_independent_LT_overline_epsilon_c_diss_hat_crit___nu_chunk_list,
-                linestyle='-', color='red', alpha=1, linewidth=2.5,
-                label=cp.LT_label)
+                cp.nu_list,
+                rate_independent_LT_full_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list,
+                linestyle=cp.LT_full_zeta_nu_char_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_overline_full_zeta_nu_char_label)
+            plt.semilogx(
+                cp.nu_list,
+                rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list,
+                linestyle=cp.LT_quarter_zeta_nu_char_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_overline_quarter_zeta_nu_char_label)
             for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
-                rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_diss_hat_crit_list = [
-                    rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_diss_hat_crit___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
+                rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_sci_hat_crit_list = [
+                    rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_sci_hat_crit___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
                     for nu_chunk_indx in range(cp.nu_num)
                 ]
                 plt.semilogx(
                     cp.nu_list,
-                    rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_diss_hat_crit_list,
+                    rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_sci_hat_crit_list,
                     linestyle=cp.beyer_2000_tau_b_linestyle_list[AFM_expermts_indx],
                     color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
                     alpha=1, linewidth=2.5,
-                    label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
+                    label=cp.beyer_2000_tau_b_overline_label_list[AFM_expermts_indx])
             plt.loglog(
-                cp.nu_list, rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_list,
-                linestyle='-', color='blue', alpha=1, linewidth=2.5,
-                label=cp.ufjc_label)
+                cp.nu_list,
+                rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_list,
+                linestyle=cp.cufjc_linestyle, color=cp.cufjc_color,
+                alpha=1, linewidth=2.5, label=cp.cufjc_overline_label)
             for f_c_dot_indx in range(cp.f_c_dot_num):
                 rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit_list = [
                     rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list[nu_chunk_indx][f_c_dot_indx]
@@ -1546,224 +2598,327 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
                 plt.loglog(
                     cp.nu_list,
                     rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit_list,
-                    linestyle='-', color=cp.f_c_dot_color_list[f_c_dot_indx],
+                    linestyle=cp.f_c_dot_linestyle_list[f_c_dot_indx],
+                    color=cp.f_c_dot_color_list[f_c_dot_indx],
                     alpha=1, linewidth=2.5,
-                    label=cp.f_c_dot_label_list[f_c_dot_indx])
-            plt.legend(loc='best', fontsize=10)
-            # plt.ylim([-0.05, 1.025])
-            plt.yticks(fontsize=16)
-            plt.xticks(fontsize=16)
+                    label=cp.f_c_dot_overline_label_list[f_c_dot_indx])
+            # plt.legend(loc='best', fontsize=12)
+            # plt.ylim([-0.015, 1.015])
+            plt.yticks(fontsize=20)
+            plt.xticks(fontsize=20)
             plt.grid(True, alpha=0.25)
             save_current_figure(
-                self.savedir, r'$\nu$', 20,
-                r'$\overline{\hat{\varepsilon}_c^{diss}}$', 20,
-                data_file_prefix+"-rate-independent-and-rate-dependent-force-controlled-nondimensional-scaled-dissipated-chain-scission-energy-vs-nu")
+                self.savedir, r'$\nu$', 30,
+                r'$\overline{(\hat{\varepsilon}_c^{sci})^{crit}},~\overline{(\hat{\varepsilon}_c^{diss})^{crit}}$', 30,
+                data_file_prefix+"-force-control-nondim-scaled-crit-diss-chain-scission-energy-vs-nu")
             
             fig = plt.figure()
             plt.loglog(
-                cp.nu_list, rate_independent_LT_g_c_crit___nu_chunk_list,
-                linestyle='-', color='red', alpha=1, linewidth=2.5,
-                label=cp.LT_label)
+                cp.nu_list,
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list,
+                linestyle=cp.LT_full_zeta_nu_char_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_full_zeta_nu_char_label)
             plt.loglog(
-                cp.nu_list, rate_independent_LT_inext_gaussian_g_c_crit___nu_chunk_list,
-                linestyle='--', color='red', alpha=1, linewidth=2.5,
-                label=cp.LT_inext_gaussian_label)
+                cp.nu_list,
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list,
+                linestyle=cp.LT_quarter_zeta_nu_char_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_quarter_zeta_nu_char_label)
             for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
-                rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit_list = [
-                    rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c_list = [
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
                     for nu_chunk_indx in range(cp.nu_num)
                 ]
                 plt.semilogx(
                     cp.nu_list,
-                    rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit_list,
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c_list,
                     linestyle=cp.beyer_2000_tau_b_linestyle_list[AFM_expermts_indx],
                     color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
                     alpha=1, linewidth=2.5,
                     label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
             plt.loglog(
-                cp.nu_list, rate_independent_g_c_crit___nu_chunk_list,
-                linestyle='-', color='blue', alpha=1, linewidth=2.5,
-                label=cp.ufjc_label)
+                cp.nu_list, rate_independent_g_c___nu_chunk_list,
+                linestyle=cp.cufjc_linestyle, color=cp.cufjc_color,
+                alpha=1, linewidth=2.5, label=cp.cufjc_label)
             for f_c_dot_indx in range(cp.f_c_dot_num):
-                rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit_list = [
-                    rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit___nu_chunk_list[nu_chunk_indx][f_c_dot_indx]
+                rate_dependent_frc_cntrld_AFM_exprmts_g_c_list = [
+                    rate_dependent_frc_cntrld_AFM_exprmts_g_c___nu_chunk_list[nu_chunk_indx][f_c_dot_indx]
                     for nu_chunk_indx in range(cp.nu_num)
                 ]
                 plt.loglog(
                     cp.nu_list,
-                    rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit_list,
-                    linestyle='-', color=cp.f_c_dot_color_list[f_c_dot_indx],
+                    rate_dependent_frc_cntrld_AFM_exprmts_g_c_list,
+                    linestyle=cp.f_c_dot_linestyle_list[f_c_dot_indx],
+                    color=cp.f_c_dot_color_list[f_c_dot_indx],
                     alpha=1, linewidth=2.5,
                     label=cp.f_c_dot_label_list[f_c_dot_indx])
-            plt.legend(loc='best', fontsize=10)
-            # plt.ylim([-0.05, 1.025])
-            plt.yticks(fontsize=16)
-            plt.xticks(fontsize=16)
+            # plt.legend(loc='best', fontsize=12)
+            # plt.ylim([-0.015, 1.015])
+            plt.yticks(fontsize=20)
+            plt.xticks(fontsize=20)
             plt.grid(True, alpha=0.25)
             save_current_figure(
-                self.savedir, r'$\nu$', 20,
-                r'$\beta G_c/(\eta^{ref}l_{\nu}^{eq})$', 20,
-                data_file_prefix+"-rate-independent-and-rate-dependent-force-controlled-nondimensional-fracture-toughness-vs-nu")
+                self.savedir, r'$\nu$', 30, r'$g_c$', 30,
+                data_file_prefix+"-force-control-nondim-fracture-toughness-vs-nu")
             
             fig = plt.figure()
             plt.loglog(
-                cp.nu_list, rate_independent_LT_g_c_crit__nu_squared___nu_chunk_list,
-                linestyle='-', color='red', alpha=1, linewidth=2.5,
-                label=cp.LT_label)
+                cp.nu_list,
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list,
+                linestyle=cp.LT_full_zeta_nu_char_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_full_zeta_nu_char_label)
             plt.loglog(
-                cp.nu_list, rate_independent_LT_inext_gaussian_g_c_crit__nu_squared___nu_chunk_list,
-                linestyle='--', color='red', alpha=1, linewidth=2.5,
-                label=cp.LT_inext_gaussian_label)
+                cp.nu_list,
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list,
+                linestyle=cp.LT_quarter_zeta_nu_char_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_quarter_zeta_nu_char_label)
             for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
-                rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit__nu_squared_list = [
-                    rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit__nu_squared___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu_list = [
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
                     for nu_chunk_indx in range(cp.nu_num)
                 ]
                 plt.semilogx(
                     cp.nu_list,
-                    rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit__nu_squared_list,
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu_list,
                     linestyle=cp.beyer_2000_tau_b_linestyle_list[AFM_expermts_indx],
                     color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
                     alpha=1, linewidth=2.5,
                     label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
             plt.loglog(
-                cp.nu_list, rate_independent_g_c_crit__nu_squared___nu_chunk_list,
-                linestyle='-', color='blue', alpha=1, linewidth=2.5,
-                label=cp.ufjc_label)
+                cp.nu_list, rate_independent_g_c__nu___nu_chunk_list,
+                linestyle=cp.cufjc_linestyle, color=cp.cufjc_color,
+                alpha=1, linewidth=2.5, label=cp.cufjc_label)
             for f_c_dot_indx in range(cp.f_c_dot_num):
-                rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit__nu_squared_list = [
-                    rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_list[nu_chunk_indx][f_c_dot_indx]
+                rate_dependent_frc_cntrld_AFM_exprmts_g_c__nu_list = [
+                    rate_dependent_frc_cntrld_AFM_exprmts_g_c__nu___nu_chunk_list[nu_chunk_indx][f_c_dot_indx]
                     for nu_chunk_indx in range(cp.nu_num)
                 ]
                 plt.loglog(
                     cp.nu_list,
-                    rate_dependent_frc_cntrld_AFM_exprmts_g_c_crit__nu_squared_list,
-                    linestyle='-', color=cp.f_c_dot_color_list[f_c_dot_indx],
+                    rate_dependent_frc_cntrld_AFM_exprmts_g_c__nu_list,
+                    linestyle=cp.f_c_dot_linestyle_list[f_c_dot_indx],
+                    color=cp.f_c_dot_color_list[f_c_dot_indx],
                     alpha=1, linewidth=2.5,
                     label=cp.f_c_dot_label_list[f_c_dot_indx])
-            plt.legend(loc='best', fontsize=10)
-            # plt.ylim([-0.05, 1.025])
-            plt.yticks(fontsize=16)
-            plt.xticks(fontsize=16)
+            # plt.legend(loc='best', fontsize=12)
+            # plt.ylim([-0.015, 1.015])
+            plt.yticks(fontsize=20)
+            plt.xticks(fontsize=20)
             plt.grid(True, alpha=0.25)
             save_current_figure(
-                self.savedir, r'$\nu$', 20,
-                r'$\beta G_c/(\eta^{ref}l_{\nu}^{eq}\nu^2)$', 20,
-                data_file_prefix+"-rate-independent-and-rate-dependent-force-controlled-nondimensional-fracture-toughness-nu-squared-normalized-vs-nu")
+                self.savedir, r'$\nu$', 30, r'$g_c/\nu$', 30,
+                data_file_prefix+"-force-control-nondim-fracture-toughness-nu-normalized-vs-nu")
             
             fig = plt.figure()
             plt.loglog(
-                cp.nu_list, rate_independent_LT_overline_g_c_crit___nu_chunk_list,
-                linestyle='-', color='red', alpha=1, linewidth=2.5,
-                label=cp.LT_label)
+                cp.nu_list,
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list,
+                linestyle=cp.LT_full_zeta_nu_char_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_overline_full_zeta_nu_char_label)
             plt.loglog(
-                cp.nu_list, rate_independent_LT_inext_gaussian_overline_g_c_crit___nu_chunk_list,
-                linestyle='--', color='red', alpha=1, linewidth=2.5,
-                label=cp.LT_inext_gaussian_label)
+                cp.nu_list,
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list,
+                linestyle=cp.LT_quarter_zeta_nu_char_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_overline_quarter_zeta_nu_char_label)
             for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
-                rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit_list = [
-                    rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c_list = [
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
                     for nu_chunk_indx in range(cp.nu_num)
                 ]
                 plt.semilogx(
                     cp.nu_list,
-                    rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit_list,
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c_list,
                     linestyle=cp.beyer_2000_tau_b_linestyle_list[AFM_expermts_indx],
                     color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
                     alpha=1, linewidth=2.5,
-                    label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
+                    label=cp.beyer_2000_tau_b_overline_label_list[AFM_expermts_indx])
             plt.loglog(
-                cp.nu_list, rate_independent_overline_g_c_crit___nu_chunk_list,
-                linestyle='-', color='blue', alpha=1, linewidth=2.5,
-                label=cp.ufjc_label)
+                cp.nu_list, rate_independent_overline_g_c___nu_chunk_list,
+                linestyle=cp.cufjc_linestyle, color=cp.cufjc_color,
+                alpha=1, linewidth=2.5, label=cp.cufjc_overline_label)
             for f_c_dot_indx in range(cp.f_c_dot_num):
-                rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit_list = [
-                    rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_list[nu_chunk_indx][f_c_dot_indx]
+                rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_list = [
+                    rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c___nu_chunk_list[nu_chunk_indx][f_c_dot_indx]
                     for nu_chunk_indx in range(cp.nu_num)
                 ]
                 plt.loglog(
                     cp.nu_list,
-                    rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit_list,
-                    linestyle='-', color=cp.f_c_dot_color_list[f_c_dot_indx],
+                    rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_list,
+                    linestyle=cp.f_c_dot_linestyle_list[f_c_dot_indx],
+                    color=cp.f_c_dot_color_list[f_c_dot_indx],
                     alpha=1, linewidth=2.5,
-                    label=cp.f_c_dot_label_list[f_c_dot_indx])
-            plt.legend(loc='best', fontsize=10)
-            # plt.ylim([-0.05, 1.025])
-            plt.yticks(fontsize=16)
-            plt.xticks(fontsize=16)
+                    label=cp.f_c_dot_overline_label_list[f_c_dot_indx])
+            # plt.legend(loc='best', fontsize=12)
+            # plt.ylim([-0.015, 1.015])
+            plt.yticks(fontsize=20)
+            plt.xticks(fontsize=20)
             plt.grid(True, alpha=0.25)
             save_current_figure(
-                self.savedir, r'$\nu$', 20,
-                r'$\beta \overline{G_c}/(\eta^{ref}l_{\nu}^{eq})$', 20,
-                data_file_prefix+"-rate-independent-and-rate-dependent-force-controlled-nondimensional-scaled-fracture-toughness-vs-nu")
+                self.savedir, r'$\nu$', 30, r'$\overline{g_c}$', 30,
+                data_file_prefix+"-force-control-nondim-scaled-fracture-toughness-vs-nu")
             
             fig = plt.figure()
             plt.loglog(
-                cp.nu_list, rate_independent_LT_overline_g_c_crit__nu_squared___nu_chunk_list,
-                linestyle='-', color='red', alpha=1, linewidth=2.5,
-                label=cp.LT_label)
+                cp.nu_list,
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list,
+                linestyle=cp.LT_full_zeta_nu_char_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_overline_full_zeta_nu_char_label)
             plt.loglog(
-                cp.nu_list, rate_independent_LT_inext_gaussian_overline_g_c_crit__nu_squared___nu_chunk_list,
-                linestyle='--', color='red', alpha=1, linewidth=2.5,
-                label=cp.LT_inext_gaussian_label)
+                cp.nu_list,
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list,
+                linestyle=cp.LT_quarter_zeta_nu_char_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_overline_quarter_zeta_nu_char_label)
             for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
-                rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit__nu_squared_list = [
-                    rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit__nu_squared___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu_list = [
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
                     for nu_chunk_indx in range(cp.nu_num)
                 ]
                 plt.semilogx(
                     cp.nu_list,
-                    rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit__nu_squared_list,
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu_list,
                     linestyle=cp.beyer_2000_tau_b_linestyle_list[AFM_expermts_indx],
                     color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
                     alpha=1, linewidth=2.5,
-                    label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
+                    label=cp.beyer_2000_tau_b_overline_label_list[AFM_expermts_indx])
             plt.loglog(
-                cp.nu_list, rate_independent_overline_g_c_crit__nu_squared___nu_chunk_list,
-                linestyle='-', color='blue', alpha=1, linewidth=2.5,
-                label=cp.ufjc_label)
+                cp.nu_list,
+                rate_independent_overline_g_c__nu___nu_chunk_list,
+                linestyle=cp.cufjc_linestyle, color=cp.cufjc_color,
+                alpha=1, linewidth=2.5, label=cp.cufjc_overline_label)
             for f_c_dot_indx in range(cp.f_c_dot_num):
-                rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared_list = [
-                    rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_list[nu_chunk_indx][f_c_dot_indx]
+                rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c__nu_list = [
+                    rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_list[nu_chunk_indx][f_c_dot_indx]
                     for nu_chunk_indx in range(cp.nu_num)
                 ]
                 plt.loglog(
                     cp.nu_list,
-                    rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared_list,
-                    linestyle='-', color=cp.f_c_dot_color_list[f_c_dot_indx],
+                    rate_dependent_frc_cntrld_AFM_exprmts_overline_g_c__nu_list,
+                    linestyle=cp.f_c_dot_linestyle_list[f_c_dot_indx],
+                    color=cp.f_c_dot_color_list[f_c_dot_indx],
                     alpha=1, linewidth=2.5,
-                    label=cp.f_c_dot_label_list[f_c_dot_indx])
-            plt.legend(loc='best', fontsize=10)
-            # plt.ylim([-0.05, 1.025])
-            plt.yticks(fontsize=16)
-            plt.xticks(fontsize=16)
+                    label=cp.f_c_dot_overline_label_list[f_c_dot_indx])
+            # plt.legend(loc='best', fontsize=12)
+            # plt.ylim([-0.015, 1.015])
+            plt.yticks(fontsize=20)
+            plt.xticks(fontsize=20)
             plt.grid(True, alpha=0.25)
             save_current_figure(
-                self.savedir, r'$\nu$', 20,
-                r'$\beta \overline{G_c}/(\eta^{ref}l_{\nu}^{eq}\nu^2)$', 20,
-                data_file_prefix+"-rate-independent-and-rate-dependent-force-controlled-nondimensional-scaled-fracture-toughness-nu-squared-normalized-vs-nu")
+                self.savedir, r'$\nu$', 30, r'$\overline{g_c}/\nu$', 30,
+                data_file_prefix+"-force-control-nondim-scaled-fracture-toughness-nu-normalized-vs-nu")
+            
+            fig = plt.figure()
+            fig_legend = plt.figure()
+            ax = fig.add_subplot(111)
+            ax.plot(
+                [], [], linestyle=cp.LT_full_zeta_nu_char_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_overline_full_zeta_nu_char_label)
+            ax.plot(
+                [], [], linestyle=cp.LT_quarter_zeta_nu_char_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_overline_quarter_zeta_nu_char_label)
+            for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
+                ax.plot(
+                    [], [],
+                    linestyle=cp.beyer_2000_tau_b_linestyle_list[AFM_expermts_indx],
+                    color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
+                    alpha=1, linewidth=2.5,
+                    label=cp.beyer_2000_tau_b_overline_label_list[AFM_expermts_indx])
+            ax.plot(
+                [], [],
+                linestyle=cp.cufjc_linestyle, color=cp.cufjc_color,
+                alpha=1, linewidth=2.5, label=cp.cufjc_overline_label)
+            for r_nu_dot_indx in range(cp.r_nu_dot_num):
+                ax.plot(
+                    [], [],
+                    linestyle=cp.r_nu_dot_linestyle_list[r_nu_dot_indx],
+                    color=cp.r_nu_dot_color_list[r_nu_dot_indx],
+                    alpha=1, linewidth=2.5,
+                    label=cp.r_nu_dot_overline_label_list[r_nu_dot_indx])
+            fig_legend.legend(
+                ax.get_legend_handles_labels()[0],
+                ax.get_legend_handles_labels()[1],
+                loc='center', fontsize=20)
+            fig_legend.savefig(
+                self.savedir+data_file_prefix+"-displacement-control-main-text-legend"+".pdf",
+                transparent=True)
+            plt.close()
+
+            fig = plt.figure()
+            fig_legend = plt.figure()
+            ax = fig.add_subplot(111)
+            ax.plot(
+                [], [], linestyle=cp.LT_full_zeta_nu_char_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_full_zeta_nu_char_label)
+            ax.plot(
+                [], [], linestyle=cp.LT_quarter_zeta_nu_char_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_quarter_zeta_nu_char_label)
+            for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
+                ax.plot(
+                    [], [],
+                    linestyle=cp.beyer_2000_tau_b_linestyle_list[AFM_expermts_indx],
+                    color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
+                    alpha=1, linewidth=2.5,
+                    label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
+            ax.plot(
+                [], [],
+                linestyle=cp.cufjc_linestyle, color=cp.cufjc_color,
+                alpha=1, linewidth=2.5, label=cp.cufjc_label)
+            for r_nu_dot_indx in range(cp.r_nu_dot_num):
+                ax.plot(
+                    [], [],
+                    linestyle=cp.r_nu_dot_linestyle_list[r_nu_dot_indx],
+                    color=cp.r_nu_dot_color_list[r_nu_dot_indx],
+                    alpha=1, linewidth=2.5,
+                    label=cp.r_nu_dot_label_list[r_nu_dot_indx])
+            fig_legend.legend(
+                ax.get_legend_handles_labels()[0],
+                ax.get_legend_handles_labels()[1],
+                loc='center', fontsize=20)
+            fig_legend.savefig(
+                self.savedir+data_file_prefix+"-displacement-control-supporting-information-legend"+".pdf",
+                transparent=True)
+            plt.close()
             
             fig = plt.figure()
             plt.semilogx(
-                cp.nu_list, rate_independent_LT_epsilon_cnu_diss_hat_crit___nu_chunk_list,
-                linestyle='-', color='red', alpha=1, linewidth=2.5,
-                label=cp.LT_label)
+                cp.nu_list,
+                rate_independent_LT_full_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list,
+                linestyle=cp.LT_full_zeta_nu_char_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_full_zeta_nu_char_label)
+            plt.semilogx(
+                cp.nu_list,
+                rate_independent_LT_quarter_zeta_nu_char_epsilon_cnu_sci_hat_crit___nu_chunk_list,
+                linestyle=cp.LT_quarter_zeta_nu_char_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_quarter_zeta_nu_char_label)
             for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
-                rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_diss_hat_crit_list = [
-                    rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_diss_hat_crit___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
+                rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_sci_hat_crit_list = [
+                    rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_sci_hat_crit___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
                     for nu_chunk_indx in range(cp.nu_num)
                 ]
                 plt.semilogx(
                     cp.nu_list,
-                    rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_diss_hat_crit_list,
+                    rate_independent_beyer_2000_f_c_max_tau_b_epsilon_cnu_sci_hat_crit_list,
                     linestyle=cp.beyer_2000_tau_b_linestyle_list[AFM_expermts_indx],
                     color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
                     alpha=1, linewidth=2.5,
                     label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
             plt.semilogx(
-                cp.nu_list, rate_independent_epsilon_cnu_diss_hat_crit___nu_chunk_list,
-                linestyle='-', color='blue', alpha=1, linewidth=2.5,
-                label=cp.ufjc_label)
+                cp.nu_list,
+                rate_independent_epsilon_cnu_diss_hat_crit___nu_chunk_list,
+                linestyle=cp.cufjc_linestyle, color=cp.cufjc_color,
+                alpha=1, linewidth=2.5, label=cp.cufjc_label)
             for r_nu_dot_indx in range(cp.r_nu_dot_num):
                 rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit_list = [
                     rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list[nu_chunk_indx][r_nu_dot_indx]
@@ -1772,40 +2927,49 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
                 plt.semilogx(
                     cp.nu_list,
                     rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit_list,
-                    linestyle='-', color=cp.r_nu_dot_color_list[r_nu_dot_indx],
+                    linestyle=cp.r_nu_dot_linestyle_list[r_nu_dot_indx],
+                    color=cp.r_nu_dot_color_list[r_nu_dot_indx],
                     alpha=1, linewidth=2.5,
                     label=cp.r_nu_dot_label_list[r_nu_dot_indx])
-            plt.legend(loc='best', fontsize=10)
+            # plt.legend(loc='best', fontsize=12)
             plt.ylim([-5, zeta_nu_char+5])
-            plt.yticks(fontsize=16)
-            plt.xticks(fontsize=16)
+            plt.yticks(fontsize=20)
+            plt.xticks(fontsize=20)
             plt.grid(True, alpha=0.25)
             save_current_figure(
-                self.savedir, r'$\nu$', 20,
-                r'$\hat{\varepsilon}_{c\nu}^{diss}$', 20,
-                data_file_prefix+"-rate-independent-and-rate-dependent-displacement-controlled-nondimensional-dissipated-chain-scission-energy-per-segment-vs-nu")
+                self.savedir, r'$\nu$', 30,
+                r'$(\hat{\varepsilon}_{c\nu}^{sci})^{crit},~(\hat{\varepsilon}_{c\nu}^{diss})^{crit}$', 30,
+                data_file_prefix+"-displacement-control-nondim-crit-diss-chain-scission-energy-per-segment-vs-nu")
             
             fig = plt.figure()
             plt.semilogx(
-                cp.nu_list, rate_independent_LT_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list,
-                linestyle='-', color='red', alpha=1, linewidth=2.5,
-                label=cp.LT_label)
+                cp.nu_list,
+                rate_independent_LT_full_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list,
+                linestyle=cp.LT_full_zeta_nu_char_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_overline_full_zeta_nu_char_label)
+            plt.semilogx(
+                cp.nu_list,
+                rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list,
+                linestyle=cp.LT_quarter_zeta_nu_char_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_overline_quarter_zeta_nu_char_label)
             for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
-                rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_diss_hat_crit_list = [
-                    rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
+                rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_sci_hat_crit_list = [
+                    rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_sci_hat_crit___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
                     for nu_chunk_indx in range(cp.nu_num)
                 ]
                 plt.semilogx(
                     cp.nu_list,
-                    rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_diss_hat_crit_list,
+                    rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_cnu_sci_hat_crit_list,
                     linestyle=cp.beyer_2000_tau_b_linestyle_list[AFM_expermts_indx],
                     color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
                     alpha=1, linewidth=2.5,
-                    label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
+                    label=cp.beyer_2000_tau_b_overline_label_list[AFM_expermts_indx])
             plt.semilogx(
                 cp.nu_list, rate_independent_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list,
-                linestyle='-', color='blue', alpha=1, linewidth=2.5,
-                label=cp.ufjc_label)
+                linestyle=cp.cufjc_linestyle, color=cp.cufjc_color,
+                alpha=1, linewidth=2.5, label=cp.cufjc_overline_label)
             for r_nu_dot_indx in range(cp.r_nu_dot_num):
                 rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit_list = [
                     rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list[nu_chunk_indx][r_nu_dot_indx]
@@ -1814,40 +2978,50 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
                 plt.semilogx(
                     cp.nu_list,
                     rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit_list,
-                    linestyle='-', color=cp.r_nu_dot_color_list[r_nu_dot_indx],
+                    linestyle=cp.r_nu_dot_linestyle_list[r_nu_dot_indx],
+                    color=cp.r_nu_dot_color_list[r_nu_dot_indx],
                     alpha=1, linewidth=2.5,
-                    label=cp.r_nu_dot_label_list[r_nu_dot_indx])
-            plt.legend(loc='best', fontsize=10)
-            plt.ylim([-0.05, 1.025])
-            plt.yticks(fontsize=16)
-            plt.xticks(fontsize=16)
+                    label=cp.r_nu_dot_overline_label_list[r_nu_dot_indx])
+            # plt.legend(loc='best', fontsize=12)
+            plt.ylim([-0.015, 1.015])
+            plt.yticks(fontsize=20)
+            plt.xticks(fontsize=20)
             plt.grid(True, alpha=0.25)
             save_current_figure(
-                self.savedir, r'$\nu$', 20,
-                r'$\overline{\hat{\varepsilon}_{c\nu}^{diss}}$', 20,
-                data_file_prefix+"-rate-independent-and-rate-dependent-displacement-controlled-nondimensional-scaled-dissipated-chain-scission-energy-per-segment-vs-nu")
+                self.savedir, r'$\nu$', 30,
+                r'$\overline{(\hat{\varepsilon}_{c\nu}^{sci})^{crit}},~\overline{(\hat{\varepsilon}_{c\nu}^{diss})^{crit}}$', 30,
+                data_file_prefix+"-displacement-control-nondim-scaled-crit-diss-chain-scission-energy-per-segment-vs-nu")
             
             fig = plt.figure()
             plt.loglog(
-                cp.nu_list, rate_independent_LT_epsilon_c_diss_hat_crit___nu_chunk_list,
-                linestyle='-', color='red', alpha=1, linewidth=2.5,
-                label=cp.LT_label)
+                cp.nu_list,
+                rate_independent_LT_full_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list,
+                linestyle=cp.LT_full_zeta_nu_char_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_full_zeta_nu_char_label)
+            plt.semilogx(
+                cp.nu_list,
+                rate_independent_LT_quarter_zeta_nu_char_epsilon_c_sci_hat_crit___nu_chunk_list,
+                linestyle=cp.LT_quarter_zeta_nu_char_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_quarter_zeta_nu_char_label)
             for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
-                rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_diss_hat_crit_list = [
-                    rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_diss_hat_crit___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
+                rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_sci_hat_crit_list = [
+                    rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_sci_hat_crit___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
                     for nu_chunk_indx in range(cp.nu_num)
                 ]
                 plt.semilogx(
                     cp.nu_list,
-                    rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_diss_hat_crit_list,
+                    rate_independent_beyer_2000_f_c_max_tau_b_epsilon_c_sci_hat_crit_list,
                     linestyle=cp.beyer_2000_tau_b_linestyle_list[AFM_expermts_indx],
                     color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
                     alpha=1, linewidth=2.5,
                     label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
             plt.loglog(
-                cp.nu_list, rate_independent_epsilon_c_diss_hat_crit___nu_chunk_list,
-                linestyle='-', color='blue', alpha=1, linewidth=2.5,
-                label=cp.ufjc_label)
+                cp.nu_list,
+                rate_independent_epsilon_c_diss_hat_crit___nu_chunk_list,
+                linestyle=cp.cufjc_linestyle, color=cp.cufjc_color,
+                alpha=1, linewidth=2.5, label=cp.cufjc_label)
             for r_nu_dot_indx in range(cp.r_nu_dot_num):
                 rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit_list = [
                     rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit___nu_chunk_list[nu_chunk_indx][r_nu_dot_indx]
@@ -1856,40 +3030,50 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
                 plt.loglog(
                     cp.nu_list,
                     rate_dependent_strn_cntrld_AFM_exprmts_epsilon_c_diss_hat_crit_list,
-                    linestyle='-', color=cp.r_nu_dot_color_list[r_nu_dot_indx],
+                    linestyle=cp.r_nu_dot_linestyle_list[r_nu_dot_indx],
+                    color=cp.r_nu_dot_color_list[r_nu_dot_indx],
                     alpha=1, linewidth=2.5,
                     label=cp.r_nu_dot_label_list[r_nu_dot_indx])
-            plt.legend(loc='best', fontsize=10)
+            # plt.legend(loc='best', fontsize=12)
             # plt.ylim([-5, zeta_nu_char+5])
-            plt.yticks(fontsize=16)
-            plt.xticks(fontsize=16)
+            plt.yticks(fontsize=20)
+            plt.xticks(fontsize=20)
             plt.grid(True, alpha=0.25)
             save_current_figure(
-                self.savedir, r'$\nu$', 20,
-                r'$\hat{\varepsilon}_c^{diss}$', 20,
-                data_file_prefix+"-rate-independent-and-rate-dependent-displacement-controlled-nondimensional-dissipated-chain-scission-energy-vs-nu")
+                self.savedir, r'$\nu$', 30,
+                r'$(\hat{\varepsilon}_c^{sci})^{crit},~(\hat{\varepsilon}_c^{diss})^{crit}$', 30,
+                data_file_prefix+"-displacement-control-nondim-crit-diss-chain-scission-energy-vs-nu")
             
             fig = plt.figure()
             plt.loglog(
-                cp.nu_list, rate_independent_LT_overline_epsilon_c_diss_hat_crit___nu_chunk_list,
-                linestyle='-', color='red', alpha=1, linewidth=2.5,
-                label=cp.LT_label)
+                cp.nu_list,
+                rate_independent_LT_full_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list,
+                linestyle=cp.LT_full_zeta_nu_char_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_overline_full_zeta_nu_char_label)
+            plt.semilogx(
+                cp.nu_list,
+                rate_independent_LT_quarter_zeta_nu_char_overline_epsilon_c_sci_hat_crit___nu_chunk_list,
+                linestyle=cp.LT_quarter_zeta_nu_char_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_overline_quarter_zeta_nu_char_label)
             for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
-                rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_diss_hat_crit_list = [
-                    rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_diss_hat_crit___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
+                rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_sci_hat_crit_list = [
+                    rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_sci_hat_crit___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
                     for nu_chunk_indx in range(cp.nu_num)
                 ]
                 plt.semilogx(
                     cp.nu_list,
-                    rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_diss_hat_crit_list,
+                    rate_independent_beyer_2000_f_c_max_tau_b_overline_epsilon_c_sci_hat_crit_list,
                     linestyle=cp.beyer_2000_tau_b_linestyle_list[AFM_expermts_indx],
                     color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
                     alpha=1, linewidth=2.5,
-                    label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
+                    label=cp.beyer_2000_tau_b_overline_label_list[AFM_expermts_indx])
             plt.loglog(
-                cp.nu_list, rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_list,
-                linestyle='-', color='blue', alpha=1, linewidth=2.5,
-                label=cp.ufjc_label)
+                cp.nu_list,
+                rate_independent_overline_epsilon_c_diss_hat_crit___nu_chunk_list,
+                linestyle=cp.cufjc_linestyle, color=cp.cufjc_color,
+                alpha=1, linewidth=2.5, label=cp.cufjc_overline_label)
             for r_nu_dot_indx in range(cp.r_nu_dot_num):
                 rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit_list = [
                     rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit___nu_chunk_list[nu_chunk_indx][r_nu_dot_indx]
@@ -1898,202 +3082,595 @@ class FractureToughnessCharacterizer(CompositeuFJCScissionCharacterizer):
                 plt.loglog(
                     cp.nu_list,
                     rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_c_diss_hat_crit_list,
-                    linestyle='-', color=cp.r_nu_dot_color_list[r_nu_dot_indx],
+                    linestyle=cp.r_nu_dot_linestyle_list[r_nu_dot_indx],
+                    color=cp.r_nu_dot_color_list[r_nu_dot_indx],
                     alpha=1, linewidth=2.5,
-                    label=cp.r_nu_dot_label_list[r_nu_dot_indx])
-            plt.legend(loc='best', fontsize=10)
-            # plt.ylim([-0.05, 1.025])
-            plt.yticks(fontsize=16)
-            plt.xticks(fontsize=16)
+                    label=cp.r_nu_dot_overline_label_list[r_nu_dot_indx])
+            # plt.legend(loc='best', fontsize=12)
+            # plt.ylim([-0.015, 1.015])
+            plt.yticks(fontsize=20)
+            plt.xticks(fontsize=20)
             plt.grid(True, alpha=0.25)
             save_current_figure(
-                self.savedir, r'$\nu$', 20,
-                r'$\overline{\hat{\varepsilon}_c^{diss}}$', 20,
-                data_file_prefix+"-rate-independent-and-rate-dependent-displacement-controlled-nondimensional-scaled-dissipated-chain-scission-energy-vs-nu")
+                self.savedir, r'$\nu$', 30,
+                r'$\overline{(\hat{\varepsilon}_c^{sci})^{crit}},~\overline{(\hat{\varepsilon}_c^{diss})^{crit}}$', 30,
+                data_file_prefix+"-displacement-control-nondim-scaled-crit-diss-chain-scission-energy-vs-nu")
             
             fig = plt.figure()
             plt.loglog(
-                cp.nu_list, rate_independent_LT_g_c_crit___nu_chunk_list,
-                linestyle='-', color='red', alpha=1, linewidth=2.5,
-                label=cp.LT_label)
+                cp.nu_list,
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list,
+                linestyle=cp.LT_full_zeta_nu_char_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_full_zeta_nu_char_label)
             plt.loglog(
-                cp.nu_list, rate_independent_LT_inext_gaussian_g_c_crit___nu_chunk_list,
-                linestyle='--', color='red', alpha=1, linewidth=2.5,
-                label=cp.LT_inext_gaussian_label)
+                cp.nu_list,
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list,
+                linestyle=cp.LT_quarter_zeta_nu_char_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_quarter_zeta_nu_char_label)
             for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
-                rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit_list = [
-                    rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c_list = [
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
                     for nu_chunk_indx in range(cp.nu_num)
                 ]
                 plt.semilogx(
                     cp.nu_list,
-                    rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit_list,
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c_list,
                     linestyle=cp.beyer_2000_tau_b_linestyle_list[AFM_expermts_indx],
                     color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
                     alpha=1, linewidth=2.5,
                     label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
             plt.loglog(
-                cp.nu_list, rate_independent_g_c_crit___nu_chunk_list,
-                linestyle='-', color='blue', alpha=1, linewidth=2.5,
-                label=cp.ufjc_label)
+                cp.nu_list, rate_independent_g_c___nu_chunk_list,
+                linestyle=cp.cufjc_linestyle, color=cp.cufjc_color,
+                alpha=1, linewidth=2.5, label=cp.cufjc_label)
             for r_nu_dot_indx in range(cp.r_nu_dot_num):
-                rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit_list = [
-                    rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit___nu_chunk_list[nu_chunk_indx][r_nu_dot_indx]
+                rate_dependent_strn_cntrld_AFM_exprmts_g_c_list = [
+                    rate_dependent_strn_cntrld_AFM_exprmts_g_c___nu_chunk_list[nu_chunk_indx][r_nu_dot_indx]
                     for nu_chunk_indx in range(cp.nu_num)
                 ]
                 plt.loglog(
                     cp.nu_list,
-                    rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit_list,
-                    linestyle='-', color=cp.r_nu_dot_color_list[r_nu_dot_indx],
+                    rate_dependent_strn_cntrld_AFM_exprmts_g_c_list,
+                    linestyle=cp.r_nu_dot_linestyle_list[r_nu_dot_indx],
+                    color=cp.r_nu_dot_color_list[r_nu_dot_indx],
                     alpha=1, linewidth=2.5,
                     label=cp.r_nu_dot_label_list[r_nu_dot_indx])
-            plt.legend(loc='best', fontsize=10)
-            # plt.ylim([-0.05, 1.025])
-            plt.yticks(fontsize=16)
-            plt.xticks(fontsize=16)
+            # plt.legend(loc='best', fontsize=12)
+            # plt.ylim([-0.015, 1.015])
+            plt.yticks(fontsize=20)
+            plt.xticks(fontsize=20)
             plt.grid(True, alpha=0.25)
             save_current_figure(
-                self.savedir, r'$\nu$', 20,
-                r'$\beta G_c/(\eta^{ref}l_{\nu}^{eq})$', 20,
-                data_file_prefix+"-rate-independent-and-rate-dependent-displacement-controlled-nondimensional-fracture-toughness-vs-nu")
+                self.savedir, r'$\nu$', 30, r'$g_c$', 30,
+                data_file_prefix+"-displacement-control-nondim-fracture-toughness-vs-nu")
             
             fig = plt.figure()
             plt.loglog(
-                cp.nu_list, rate_independent_LT_g_c_crit__nu_squared___nu_chunk_list,
-                linestyle='-', color='red', alpha=1, linewidth=2.5,
-                label=cp.LT_label)
+                cp.nu_list,
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list,
+                linestyle=cp.LT_full_zeta_nu_char_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_full_zeta_nu_char_label)
             plt.loglog(
-                cp.nu_list, rate_independent_LT_inext_gaussian_g_c_crit__nu_squared___nu_chunk_list,
-                linestyle='--', color='red', alpha=1, linewidth=2.5,
-                label=cp.LT_inext_gaussian_label)
+                cp.nu_list,
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list,
+                linestyle=cp.LT_quarter_zeta_nu_char_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_quarter_zeta_nu_char_label)
             for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
-                rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit__nu_squared_list = [
-                    rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit__nu_squared___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu_list = [
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
                     for nu_chunk_indx in range(cp.nu_num)
                 ]
                 plt.semilogx(
                     cp.nu_list,
-                    rate_independent_beyer_2000_f_c_max_tau_b_g_c_crit__nu_squared_list,
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu_list,
                     linestyle=cp.beyer_2000_tau_b_linestyle_list[AFM_expermts_indx],
                     color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
                     alpha=1, linewidth=2.5,
                     label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
             plt.loglog(
-                cp.nu_list, rate_independent_g_c_crit__nu_squared___nu_chunk_list,
-                linestyle='-', color='blue', alpha=1, linewidth=2.5,
-                label=cp.ufjc_label)
+                cp.nu_list, rate_independent_g_c__nu___nu_chunk_list,
+                linestyle=cp.cufjc_linestyle, color=cp.cufjc_color,
+                alpha=1, linewidth=2.5, label=cp.cufjc_label)
             for r_nu_dot_indx in range(cp.r_nu_dot_num):
-                rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit__nu_squared_list = [
-                    rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit__nu_squared___nu_chunk_list[nu_chunk_indx][r_nu_dot_indx]
+                rate_dependent_strn_cntrld_AFM_exprmts_g_c__nu_list = [
+                    rate_dependent_strn_cntrld_AFM_exprmts_g_c__nu___nu_chunk_list[nu_chunk_indx][r_nu_dot_indx]
                     for nu_chunk_indx in range(cp.nu_num)
                 ]
                 plt.loglog(
                     cp.nu_list,
-                    rate_dependent_strn_cntrld_AFM_exprmts_g_c_crit__nu_squared_list,
-                    linestyle='-', color=cp.r_nu_dot_color_list[r_nu_dot_indx],
+                    rate_dependent_strn_cntrld_AFM_exprmts_g_c__nu_list,
+                    linestyle=cp.r_nu_dot_linestyle_list[r_nu_dot_indx],
+                    color=cp.r_nu_dot_color_list[r_nu_dot_indx],
                     alpha=1, linewidth=2.5,
                     label=cp.r_nu_dot_label_list[r_nu_dot_indx])
-            plt.legend(loc='best', fontsize=10)
-            # plt.ylim([-0.05, 1.025])
-            plt.yticks(fontsize=16)
-            plt.xticks(fontsize=16)
+            # plt.legend(loc='best', fontsize=12)
+            # plt.ylim([-0.015, 1.015])
+            plt.yticks(fontsize=20)
+            plt.xticks(fontsize=20)
             plt.grid(True, alpha=0.25)
             save_current_figure(
-                self.savedir, r'$\nu$', 20,
-                r'$\beta G_c/(\eta^{ref}l_{\nu}^{eq}\nu^2)$', 20,
-                data_file_prefix+"-rate-independent-and-rate-dependent-displacement-controlled-nondimensional-fracture-toughness-nu-squared-normalized-vs-nu")
+                self.savedir, r'$\nu$', 30, r'$g_c/\nu$', 30,
+                data_file_prefix+"-displacement-control-nondim-fracture-toughness-nu-normalized-vs-nu")
             
             fig = plt.figure()
             plt.loglog(
-                cp.nu_list, rate_independent_LT_overline_g_c_crit___nu_chunk_list,
-                linestyle='-', color='red', alpha=1, linewidth=2.5,
-                label=cp.LT_label)
+                cp.nu_list,
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list,
+                linestyle=cp.LT_full_zeta_nu_char_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_overline_full_zeta_nu_char_label)
             plt.loglog(
-                cp.nu_list, rate_independent_LT_inext_gaussian_overline_g_c_crit___nu_chunk_list,
-                linestyle='--', color='red', alpha=1, linewidth=2.5,
-                label=cp.LT_inext_gaussian_label)
+                cp.nu_list,
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list,
+                linestyle=cp.LT_quarter_zeta_nu_char_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_overline_quarter_zeta_nu_char_label)
             for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
-                rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit_list = [
-                    rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c_list = [
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
                     for nu_chunk_indx in range(cp.nu_num)
                 ]
                 plt.semilogx(
                     cp.nu_list,
-                    rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit_list,
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c_list,
                     linestyle=cp.beyer_2000_tau_b_linestyle_list[AFM_expermts_indx],
                     color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
                     alpha=1, linewidth=2.5,
-                    label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
+                    label=cp.beyer_2000_tau_b_overline_label_list[AFM_expermts_indx])
             plt.loglog(
-                cp.nu_list, rate_independent_overline_g_c_crit___nu_chunk_list,
-                linestyle='-', color='blue', alpha=1, linewidth=2.5,
-                label=cp.ufjc_label)
+                cp.nu_list, rate_independent_overline_g_c___nu_chunk_list,
+                linestyle=cp.cufjc_linestyle, color=cp.cufjc_color,
+                alpha=1, linewidth=2.5, label=cp.cufjc_overline_label)
             for r_nu_dot_indx in range(cp.r_nu_dot_num):
-                rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit_list = [
-                    rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit___nu_chunk_list[nu_chunk_indx][r_nu_dot_indx]
+                rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_list = [
+                    rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c___nu_chunk_list[nu_chunk_indx][r_nu_dot_indx]
                     for nu_chunk_indx in range(cp.nu_num)
                 ]
                 plt.loglog(
                     cp.nu_list,
-                    rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit_list,
-                    linestyle='-', color=cp.r_nu_dot_color_list[r_nu_dot_indx],
+                    rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_list,
+                    linestyle=cp.r_nu_dot_linestyle_list[r_nu_dot_indx],
+                    color=cp.r_nu_dot_color_list[r_nu_dot_indx],
                     alpha=1, linewidth=2.5,
-                    label=cp.r_nu_dot_label_list[r_nu_dot_indx])
-            plt.legend(loc='best', fontsize=10)
-            # plt.ylim([-0.05, 1.025])
-            plt.yticks(fontsize=16)
-            plt.xticks(fontsize=16)
+                    label=cp.r_nu_dot_overline_label_list[r_nu_dot_indx])
+            # plt.legend(loc='best', fontsize=12)
+            # plt.ylim([-0.015, 1.015])
+            plt.yticks(fontsize=20)
+            plt.xticks(fontsize=20)
             plt.grid(True, alpha=0.25)
             save_current_figure(
-                self.savedir, r'$\nu$', 20,
-                r'$\beta \overline{G_c}/(\eta^{ref}l_{\nu}^{eq})$', 20,
-                data_file_prefix+"-rate-independent-and-rate-dependent-displacement-controlled-nondimensional-scaled-fracture-toughness-vs-nu")
+                self.savedir, r'$\nu$', 30, r'$\overline{g_c}$', 30,
+                data_file_prefix+"-displacement-control-nondim-scaled-fracture-toughness-vs-nu")
             
             fig = plt.figure()
             plt.loglog(
-                cp.nu_list, rate_independent_LT_overline_g_c_crit__nu_squared___nu_chunk_list,
-                linestyle='-', color='red', alpha=1, linewidth=2.5,
-                label=cp.LT_label)
+                cp.nu_list,
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list,
+                linestyle=cp.LT_full_zeta_nu_char_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_overline_full_zeta_nu_char_label)
             plt.loglog(
-                cp.nu_list, rate_independent_LT_inext_gaussian_overline_g_c_crit__nu_squared___nu_chunk_list,
-                linestyle='--', color='red', alpha=1, linewidth=2.5,
-                label=cp.LT_inext_gaussian_label)
+                cp.nu_list,
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list,
+                linestyle=cp.LT_quarter_zeta_nu_char_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_overline_quarter_zeta_nu_char_label)
             for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
-                rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit__nu_squared_list = [
-                    rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit__nu_squared___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu_list = [
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
                     for nu_chunk_indx in range(cp.nu_num)
                 ]
                 plt.semilogx(
                     cp.nu_list,
-                    rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_crit__nu_squared_list,
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu_list,
                     linestyle=cp.beyer_2000_tau_b_linestyle_list[AFM_expermts_indx],
                     color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
                     alpha=1, linewidth=2.5,
-                    label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
+                    label=cp.beyer_2000_tau_b_overline_label_list[AFM_expermts_indx])
             plt.loglog(
-                cp.nu_list, rate_independent_overline_g_c_crit__nu_squared___nu_chunk_list,
-                linestyle='-', color='blue', alpha=1, linewidth=2.5,
-                label=cp.ufjc_label)
+                cp.nu_list, rate_independent_overline_g_c__nu___nu_chunk_list,
+                linestyle=cp.cufjc_linestyle, color=cp.cufjc_color,
+                alpha=1, linewidth=2.5, label=cp.cufjc_overline_label)
             for r_nu_dot_indx in range(cp.r_nu_dot_num):
-                rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared_list = [
-                    rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared___nu_chunk_list[nu_chunk_indx][r_nu_dot_indx]
+                rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c__nu_list = [
+                    rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c__nu___nu_chunk_list[nu_chunk_indx][r_nu_dot_indx]
                     for nu_chunk_indx in range(cp.nu_num)
                 ]
                 plt.loglog(
                     cp.nu_list,
-                    rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c_crit__nu_squared_list,
-                    linestyle='-', color=cp.r_nu_dot_color_list[r_nu_dot_indx],
+                    rate_dependent_strn_cntrld_AFM_exprmts_overline_g_c__nu_list,
+                    linestyle=cp.r_nu_dot_linestyle_list[r_nu_dot_indx],
+                    color=cp.r_nu_dot_color_list[r_nu_dot_indx],
                     alpha=1, linewidth=2.5,
-                    label=cp.r_nu_dot_label_list[r_nu_dot_indx])
-            plt.legend(loc='best', fontsize=10)
-            # plt.ylim([-0.05, 1.025])
-            plt.yticks(fontsize=16)
-            plt.xticks(fontsize=16)
+                    label=cp.r_nu_dot_overline_label_list[r_nu_dot_indx])
+            # plt.legend(loc='best', fontsize=12)
+            # plt.ylim([-0.015, 1.015])
+            plt.yticks(fontsize=20)
+            plt.xticks(fontsize=20)
             plt.grid(True, alpha=0.25)
             save_current_figure(
-                self.savedir, r'$\nu$', 20,
-                r'$\beta \overline{G_c}/(\eta^{ref}l_{\nu}^{eq}\nu^2)$', 20,
-                data_file_prefix+"-rate-independent-and-rate-dependent-displacement-controlled-nondimensional-scaled-fracture-toughness-nu-squared-normalized-vs-nu")
+                self.savedir, r'$\nu$', 30, r'$\overline{g_c}/\nu$', 30,
+                data_file_prefix+"-displacement-control-nondim-scaled-fracture-toughness-nu-normalized-vs-nu")
+            
+            fig = plt.figure()
+            if cp.f_c_dot_num == cp.r_nu_dot_num:
+                for indx in range(cp.f_c_dot_num):
+                    rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit_list = [
+                        rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list[nu_chunk_indx][indx]
+                        for nu_chunk_indx in range(cp.nu_num)
+                    ]
+                    rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit_list = [
+                        rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit___nu_chunk_list[nu_chunk_indx][indx]
+                        for nu_chunk_indx in range(cp.nu_num)
+                    ]
+                    plt.semilogx(
+                        cp.nu_list,
+                        rate_dependent_frc_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit_list,
+                        linestyle=cp.f_c_dot_comparison_linestyle_list[indx],
+                        color=cp.f_c_dot_comparison_color_list[indx],
+                        alpha=1, linewidth=2.5,
+                        label=cp.f_c_dot_comparison_label_list[indx])
+                    plt.semilogx(
+                        cp.nu_list,
+                        rate_dependent_strn_cntrld_AFM_exprmts_epsilon_cnu_diss_hat_crit_list,
+                        linestyle=cp.r_nu_dot_comparison_linestyle_list[indx],
+                        color=cp.r_nu_dot_comparison_color_list[indx],
+                        alpha=1, linewidth=2.5,
+                        label=cp.r_nu_dot_comparison_label_list[indx])
+            plt.legend(loc='best', fontsize=12)
+            plt.ylim([-5, zeta_nu_char+5])
+            plt.yticks(fontsize=20)
+            plt.xticks(fontsize=20)
+            plt.grid(True, alpha=0.25)
+            save_current_figure(
+                self.savedir, r'$\nu$', 30,
+                r'$(\hat{\varepsilon}_{c\nu}^{diss})^{crit}$', 30,
+                data_file_prefix+"-control-comparison-nondim-crit-diss-chain-scission-energy-per-segment-vs-nu")
+            
+            fig = plt.figure()
+            if cp.f_c_dot_num == cp.r_nu_dot_num:
+                for indx in range(cp.f_c_dot_num):
+                    rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit_list = [
+                        rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list[nu_chunk_indx][indx]
+                        for nu_chunk_indx in range(cp.nu_num)
+                    ]
+                    rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit_list = [
+                        rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit___nu_chunk_list[nu_chunk_indx][indx]
+                        for nu_chunk_indx in range(cp.nu_num)
+                    ]
+                    plt.semilogx(
+                        cp.nu_list,
+                        rate_dependent_frc_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit_list,
+                        linestyle=cp.f_c_dot_comparison_linestyle_list[indx],
+                        color=cp.f_c_dot_comparison_color_list[indx],
+                        alpha=1, linewidth=2.5,
+                        label=cp.f_c_dot_comparison_overline_label_list[indx])
+                    plt.semilogx(
+                        cp.nu_list,
+                        rate_dependent_strn_cntrld_AFM_exprmts_overline_epsilon_cnu_diss_hat_crit_list,
+                        linestyle=cp.r_nu_dot_comparison_linestyle_list[indx],
+                        color=cp.r_nu_dot_comparison_color_list[indx],
+                        alpha=1, linewidth=2.5,
+                        label=cp.r_nu_dot_comparison_overline_label_list[indx])
+            plt.legend(loc='best', fontsize=12)
+            plt.ylim([-0.015, 1.015])
+            plt.yticks(fontsize=20)
+            plt.xticks(fontsize=20)
+            plt.grid(True, alpha=0.25)
+            save_current_figure(
+                self.savedir, r'$\nu$', 30,
+                r'$\overline{(\hat{\varepsilon}_{c\nu}^{diss})^{crit}}$', 30,
+                data_file_prefix+"-control-comparison-nondim-scaled-crit-diss-chain-scission-energy-per-segment-vs-nu")
+            
+            fig = plt.figure()
+            fig_legend = plt.figure()
+            ax = fig.add_subplot(111)
+            ax.plot(
+                [], [], linestyle=cp.cufjc_A_nu_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_overline_full_zeta_nu_char_label)
+            ax.plot(
+                [], [], linestyle=cp.cufjc_A_nu_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_overline_quarter_zeta_nu_char_label)
+            for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
+                ax.plot(
+                    [], [],
+                    linestyle=cp.cufjc_A_nu_linestyle,
+                    color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
+                    alpha=1, linewidth=2.5,
+                    label=cp.beyer_2000_tau_b_overline_label_list[AFM_expermts_indx])
+            ax.plot(
+                [], [], linestyle=cp.cufjc_A_nu_linestyle,
+                color='white', alpha=1, linewidth=2.5,
+                label=' ')
+            ax.plot(
+                [], [], linestyle=cp.inext_gaussian_A_nu_linestyle,
+                color='black', alpha=1, linewidth=2.5,
+                label=r'$\textrm{inextensible Gaussian chain}~\mathcal{A}_{\nu}=1/\sqrt{\nu}$')
+            ax.plot(
+                [], [], linestyle=cp.cufjc_A_nu_linestyle,
+                color='black', alpha=1, linewidth=2.5,
+                label=r'$\textrm{c}u\textrm{FJC scission}~\mathcal{A}_{\nu}$')
+            fig_legend.legend(
+                ax.get_legend_handles_labels()[0],
+                ax.get_legend_handles_labels()[1],
+                loc='center', fontsize=20)
+            fig_legend.savefig(
+                self.savedir+data_file_prefix+"-A_nu-cufjc-igc-comparison-nondim-scaled-supporting-information-legend"+".pdf",
+                transparent=True)
+            plt.close()
+
+            fig = plt.figure()
+            fig_legend = plt.figure()
+            ax = fig.add_subplot(111)
+            ax.plot(
+                [], [], linestyle=cp.cufjc_A_nu_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_full_zeta_nu_char_label)
+            ax.plot(
+                [], [], linestyle=cp.cufjc_A_nu_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_quarter_zeta_nu_char_label)
+            for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
+                ax.plot(
+                    [], [],
+                    linestyle=cp.cufjc_A_nu_linestyle,
+                    color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
+                    alpha=1, linewidth=2.5,
+                    label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
+            ax.plot(
+                [], [], linestyle=cp.cufjc_A_nu_linestyle,
+                color='white', alpha=1, linewidth=2.5,
+                label=' ')
+            ax.plot(
+                [], [], linestyle=cp.inext_gaussian_A_nu_linestyle,
+                color='black', alpha=1, linewidth=2.5,
+                label=r'$\textrm{inextensible Gaussian chain}~\mathcal{A}_{\nu}=1/\sqrt{\nu}$')
+            ax.plot(
+                [], [], linestyle=cp.cufjc_A_nu_linestyle,
+                color='black', alpha=1, linewidth=2.5,
+                label=r'$\textrm{c}u\textrm{FJC scission}~\mathcal{A}_{\nu}$')
+            fig_legend.legend(
+                ax.get_legend_handles_labels()[0],
+                ax.get_legend_handles_labels()[1],
+                loc='center', fontsize=20)
+            fig_legend.savefig(
+                self.savedir+data_file_prefix+"-A_nu-cufjc-igc-comparison-nondim-supporting-information-legend"+".pdf",
+                transparent=True)
+            plt.close()
+            
+            fig = plt.figure()
+            plt.loglog(
+                cp.nu_list,
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list,
+                linestyle=cp.inext_gaussian_A_nu_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_full_zeta_nu_char_label)
+            plt.loglog(
+                cp.nu_list,
+                rate_independent_LT_full_zeta_nu_char_g_c___nu_chunk_list,
+                linestyle=cp.cufjc_A_nu_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_full_zeta_nu_char_label)
+            plt.loglog(
+                cp.nu_list,
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c___nu_chunk_list,
+                linestyle=cp.inext_gaussian_A_nu_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_quarter_zeta_nu_char_label)
+            plt.loglog(
+                cp.nu_list,
+                rate_independent_LT_quarter_zeta_nu_char_g_c___nu_chunk_list,
+                linestyle=cp.cufjc_A_nu_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_quarter_zeta_nu_char_label)
+            for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c_list = [
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
+                    for nu_chunk_indx in range(cp.nu_num)
+                ]
+                rate_independent_beyer_2000_f_c_max_tau_b_g_c_list = [
+                    rate_independent_beyer_2000_f_c_max_tau_b_g_c___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
+                    for nu_chunk_indx in range(cp.nu_num)
+                ]
+                plt.semilogx(
+                    cp.nu_list,
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c_list,
+                    linestyle=cp.inext_gaussian_A_nu_linestyle,
+                    color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
+                    alpha=1, linewidth=2.5,
+                    label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
+                plt.semilogx(
+                    cp.nu_list,
+                    rate_independent_beyer_2000_f_c_max_tau_b_g_c_list,
+                    linestyle=cp.cufjc_A_nu_linestyle,
+                    color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
+                    alpha=1, linewidth=2.5,
+                    label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
+            # plt.legend(loc='best', fontsize=12)
+            # plt.ylim([-0.015, 1.015])
+            plt.yticks(fontsize=20)
+            plt.xticks(fontsize=20)
+            plt.grid(True, alpha=0.25)
+            save_current_figure(
+                self.savedir, r'$\nu$', 30, r'$g_c$', 30,
+                data_file_prefix+"-A_nu-cufjc-igc-comparison-nondim-fracture-toughness-vs-nu")
+            
+            fig = plt.figure()
+            plt.loglog(
+                cp.nu_list,
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list,
+                linestyle=cp.inext_gaussian_A_nu_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_full_zeta_nu_char_label)
+            plt.loglog(
+                cp.nu_list,
+                rate_independent_LT_full_zeta_nu_char_g_c__nu___nu_chunk_list,
+                linestyle=cp.cufjc_A_nu_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_full_zeta_nu_char_label)
+            plt.loglog(
+                cp.nu_list,
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_g_c__nu___nu_chunk_list,
+                linestyle=cp.inext_gaussian_A_nu_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_quarter_zeta_nu_char_label)
+            plt.loglog(
+                cp.nu_list,
+                rate_independent_LT_quarter_zeta_nu_char_g_c__nu___nu_chunk_list,
+                linestyle=cp.cufjc_A_nu_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_quarter_zeta_nu_char_label)
+            for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu_list = [
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
+                    for nu_chunk_indx in range(cp.nu_num)
+                ]
+                rate_independent_beyer_2000_f_c_max_tau_b_g_c__nu_list = [
+                    rate_independent_beyer_2000_f_c_max_tau_b_g_c__nu___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
+                    for nu_chunk_indx in range(cp.nu_num)
+                ]
+                plt.semilogx(
+                    cp.nu_list,
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_g_c__nu_list,
+                    linestyle=cp.inext_gaussian_A_nu_linestyle,
+                    color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
+                    alpha=1, linewidth=2.5,
+                    label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
+                plt.semilogx(
+                    cp.nu_list,
+                    rate_independent_beyer_2000_f_c_max_tau_b_g_c__nu_list,
+                    linestyle=cp.cufjc_A_nu_linestyle,
+                    color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
+                    alpha=1, linewidth=2.5,
+                    label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
+            # plt.legend(loc='best', fontsize=12)
+            # plt.ylim([-0.015, 1.015])
+            plt.yticks(fontsize=20)
+            plt.xticks(fontsize=20)
+            plt.grid(True, alpha=0.25)
+            save_current_figure(
+                self.savedir, r'$\nu$', 30, r'$g_c/\nu$', 30,
+                data_file_prefix+"-A_nu-cufjc-igc-comparison-nondim-fracture-toughness-nu-normalized-vs-nu")
+            
+            fig = plt.figure()
+            plt.loglog(
+                cp.nu_list,
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list,
+                linestyle=cp.inext_gaussian_A_nu_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_full_zeta_nu_char_label)
+            plt.loglog(
+                cp.nu_list,
+                rate_independent_LT_full_zeta_nu_char_overline_g_c___nu_chunk_list,
+                linestyle=cp.cufjc_A_nu_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_full_zeta_nu_char_label)
+            plt.loglog(
+                cp.nu_list,
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c___nu_chunk_list,
+                linestyle=cp.inext_gaussian_A_nu_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_quarter_zeta_nu_char_label)
+            plt.loglog(
+                cp.nu_list,
+                rate_independent_LT_quarter_zeta_nu_char_overline_g_c___nu_chunk_list,
+                linestyle=cp.cufjc_A_nu_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_quarter_zeta_nu_char_label)
+            for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c_list = [
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
+                    for nu_chunk_indx in range(cp.nu_num)
+                ]
+                rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_list = [
+                    rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
+                    for nu_chunk_indx in range(cp.nu_num)
+                ]
+                plt.semilogx(
+                    cp.nu_list,
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c_list,
+                    linestyle=cp.inext_gaussian_A_nu_linestyle,
+                    color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
+                    alpha=1, linewidth=2.5,
+                    label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
+                plt.semilogx(
+                    cp.nu_list,
+                    rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c_list,
+                    linestyle=cp.cufjc_A_nu_linestyle,
+                    color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
+                    alpha=1, linewidth=2.5,
+                    label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
+            # plt.legend(loc='best', fontsize=12)
+            # plt.ylim([-0.015, 1.015])
+            plt.yticks(fontsize=20)
+            plt.xticks(fontsize=20)
+            plt.grid(True, alpha=0.25)
+            save_current_figure(
+                self.savedir, r'$\nu$', 30, r'$\overline{g_c}$', 30,
+                data_file_prefix+"-A_nu-cufjc-igc-comparison-nondim-scaled-fracture-toughness-vs-nu")
+            
+            fig = plt.figure()
+            plt.loglog(
+                cp.nu_list,
+                rate_independent_LT_full_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list,
+                linestyle=cp.inext_gaussian_A_nu_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_full_zeta_nu_char_label)
+            plt.loglog(
+                cp.nu_list,
+                rate_independent_LT_full_zeta_nu_char_overline_g_c__nu___nu_chunk_list,
+                linestyle=cp.cufjc_A_nu_linestyle,
+                color=cp.LT_full_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_full_zeta_nu_char_label)
+            plt.loglog(
+                cp.nu_list,
+                rate_independent_LT_quarter_zeta_nu_char_inext_gaussian_overline_g_c__nu___nu_chunk_list,
+                linestyle=cp.inext_gaussian_A_nu_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_quarter_zeta_nu_char_label)
+            plt.loglog(
+                cp.nu_list,
+                rate_independent_LT_quarter_zeta_nu_char_overline_g_c__nu___nu_chunk_list,
+                linestyle=cp.cufjc_A_nu_linestyle,
+                color=cp.LT_quarter_zeta_nu_char_color, alpha=1, linewidth=2.5,
+                label=cp.LT_quarter_zeta_nu_char_label)
+            for AFM_expermts_indx in cp.AFM_exprmts_indx_list:
+                rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu_list = [
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
+                    for nu_chunk_indx in range(cp.nu_num)
+                ]
+                rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c__nu_list = [
+                    rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c__nu___nu_chunk_list[nu_chunk_indx][AFM_expermts_indx]
+                    for nu_chunk_indx in range(cp.nu_num)
+                ]
+                plt.semilogx(
+                    cp.nu_list,
+                    rate_independent_beyer_2000_f_c_max_tau_b_inext_gaussian_overline_g_c__nu_list,
+                    linestyle=cp.inext_gaussian_A_nu_linestyle,
+                    color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
+                    alpha=1, linewidth=2.5,
+                    label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
+                plt.semilogx(
+                    cp.nu_list,
+                    rate_independent_beyer_2000_f_c_max_tau_b_overline_g_c__nu_list,
+                    linestyle=cp.cufjc_A_nu_linestyle,
+                    color=cp.beyer_2000_tau_b_color_list[AFM_expermts_indx],
+                    alpha=1, linewidth=2.5,
+                    label=cp.beyer_2000_tau_b_label_list[AFM_expermts_indx])
+            # plt.legend(loc='best', fontsize=12)
+            # plt.ylim([-0.015, 1.015])
+            plt.yticks(fontsize=20)
+            plt.xticks(fontsize=20)
+            plt.grid(True, alpha=0.25)
+            save_current_figure(
+                self.savedir, r'$\nu$', 30, r'$\overline{g_c}/\nu$', 30,
+                data_file_prefix+"-A_nu-cufjc-igc-comparison-nondim-scaled-fracture-toughness-nu-normalized-vs-nu")
 
 
 if __name__ == '__main__':
@@ -2106,10 +3683,12 @@ if __name__ == '__main__':
 
     al_maawali_et_al_fracture_toughness_characterizer = (
         FractureToughnessCharacterizer(
-            paper_authors="al-maawali-et-al", chain="chain-a", T=T,)
+            paper_authors="al-maawali-et-al", chain="chain-a", T=T)
     )
     # al_maawali_et_al_fracture_toughness_characterizer.characterization()
     al_maawali_et_al_fracture_toughness_characterizer.finalization()
+
+    del al_maawali_et_al_fracture_toughness_characterizer
 
     hugel_et_al_fracture_toughness_characterizer = (
         FractureToughnessCharacterizer(
@@ -2117,3 +3696,5 @@ if __name__ == '__main__':
     )
     # hugel_et_al_fracture_toughness_characterizer.characterization()
     hugel_et_al_fracture_toughness_characterizer.finalization()
+
+    del hugel_et_al_fracture_toughness_characterizer
