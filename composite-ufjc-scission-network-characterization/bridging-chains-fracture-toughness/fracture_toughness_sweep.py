@@ -10,7 +10,6 @@ from composite_ufjc_scission import (
     RateDependentScissionCompositeuFJC,
     latex_formatting_figure,
     save_current_figure,
-    save_current_figure_no_labels,
     save_pickle_object,
     load_pickle_object
 )
@@ -1217,221 +1216,7 @@ class FractureToughnessSweepCharacterizer(CompositeuFJCScissionCharacterizer):
             save_current_figure(
                 self.savedir, r'$\lambda_c^{eq}$', 30, r'$\xi_c$', 30,
                 "zeta_nu_char-xi_c-vs-lmbda_c_eq")
-            
-            overline_epsilon_cnu_diss_hat_crit_contourf_levels_num = 101
-            overline_epsilon_cnu_diss_hat_crit_contourf_levels = np.linspace(
-                0, 1, overline_epsilon_cnu_diss_hat_crit_contourf_levels_num)
-            
-            overline_epsilon_cnu_diss_hat_crit_contourf_ticks_num = 11
-            overline_epsilon_cnu_diss_hat_crit_contourf_ticks = np.linspace(
-                0, 1, overline_epsilon_cnu_diss_hat_crit_contourf_ticks_num)
 
-            overline_epsilon_cnu_diss_hat_crit_contour_levels_num = 26
-            overline_epsilon_cnu_diss_hat_crit_contour_levels = np.linspace(
-                0, 1, overline_epsilon_cnu_diss_hat_crit_contour_levels_num)
-
-            kappa_nu_list_meshgrid, check_xi_c_dot_list_meshgrid = np.meshgrid(
-                cp.kappa_nu_list, cp.check_xi_c_dot_list)
-
-            rate_dependent_kappa_nu_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit_list = (
-                np.asarray(rate_dependent_kappa_nu_overline_epsilon_cnu_diss_hat_crit___check_xi_c_dot_chunk_list)
-            )
-            
-            fig, ax1 = plt.subplots()
-
-            filled_contour_plot = ax1.contourf(
-                kappa_nu_list_meshgrid, check_xi_c_dot_list_meshgrid,
-                rate_dependent_kappa_nu_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit_list,
-                levels=overline_epsilon_cnu_diss_hat_crit_contourf_levels,
-                cmap=plt.cm.hsv)
-            
-            for fcp in filled_contour_plot.collections:
-                fcp.set_edgecolor('face')
-            
-            ax1.set_xlabel(r'$\kappa_{\nu}$', fontsize=30)
-            ax1.set_ylabel(r'$\check{\dot{\xi}}_c$', fontsize=30)
-            ax1.set_xscale('log')
-            ax1.set_yscale('log')
-            # ax1.tick_params(axis='both', labelsize=16)
-
-            labeled_contour_plot = ax1.contour(
-                kappa_nu_list_meshgrid, check_xi_c_dot_list_meshgrid,
-                rate_dependent_kappa_nu_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit_list,
-                levels=overline_epsilon_cnu_diss_hat_crit_contour_levels,
-                colors=('black',), linewidths=0.25)
-            ax1.clabel(
-                labeled_contour_plot, fmt='%3.2f',
-                colors='black',  fontsize=10)
-            
-            ax1.set_ylim(top=1e-3)
-
-            cbar = fig.colorbar(
-                filled_contour_plot,
-                ticks=overline_epsilon_cnu_diss_hat_crit_contourf_ticks)
-            cbar.ax.set_ylabel(
-                r'$\overline{(\hat{\varepsilon}_{c\nu}^{diss})^{crit}}$',
-                fontsize=30)
-            cbar.ax.tick_params(axis='y', labelsize=20)
-            
-            plt.yticks(fontsize=20)
-            plt.xticks(fontsize=20)
-            
-            save_current_figure_no_labels(
-                self.savedir,
-                "overline_epsilon_cnu_diss_hat_crit-filled-contour-check_xi_c_dot-vs-kappa_nu")
-            
-            kappa_nu_list_meshgrid, check_lmbda_c_eq_dot_list_meshgrid = (
-                np.meshgrid(cp.kappa_nu_list, cp.check_lmbda_c_eq_dot_list)
-            )
-
-            rate_dependent_kappa_nu_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit_list = (
-                np.asarray(rate_dependent_kappa_nu_overline_epsilon_cnu_diss_hat_crit___check_lmbda_c_eq_dot_chunk_list)
-            )
-            
-            fig, ax1 = plt.subplots()
-
-            filled_contour_plot = ax1.contourf(
-                kappa_nu_list_meshgrid, check_lmbda_c_eq_dot_list_meshgrid,
-                rate_dependent_kappa_nu_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit_list,
-                levels=overline_epsilon_cnu_diss_hat_crit_contourf_levels,
-                cmap=plt.cm.hsv)
-            
-            for fcp in filled_contour_plot.collections:
-                fcp.set_edgecolor('face')
-            
-            ax1.set_xlabel(r'$\kappa_{\nu}$', fontsize=30)
-            ax1.set_ylabel(r'$\check{\dot{\lambda}}_c^{eq}$', fontsize=30)
-            ax1.set_xscale('log')
-            ax1.set_yscale('log')
-            # ax1.tick_params(axis='both', labelsize=16)
-
-            labeled_contour_plot = ax1.contour(
-                kappa_nu_list_meshgrid, check_lmbda_c_eq_dot_list_meshgrid,
-                rate_dependent_kappa_nu_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit_list,
-                levels=overline_epsilon_cnu_diss_hat_crit_contour_levels,
-                colors=('black',), linewidths=0.25)
-            ax1.clabel(
-                labeled_contour_plot, fmt='%3.2f',
-                colors='black',  fontsize=10)
-            
-            ax1.set_ylim(top=1e-3)
-
-            cbar = fig.colorbar(
-                filled_contour_plot,
-                ticks=overline_epsilon_cnu_diss_hat_crit_contourf_ticks)
-            cbar.ax.set_ylabel(
-                r'$\overline{(\hat{\varepsilon}_{c\nu}^{diss})^{crit}}$',
-                fontsize=30)
-            cbar.ax.tick_params(axis='y', labelsize=20)
-            
-            plt.yticks(fontsize=20)
-            plt.xticks(fontsize=20)
-            
-            save_current_figure_no_labels(
-                self.savedir,
-                "overline_epsilon_cnu_diss_hat_crit-filled-contour-check_lmbda_c_eq_dot-vs-kappa_nu")
-            
-            zeta_nu_char_list_meshgrid, check_xi_c_dot_list_meshgrid = (
-                np.meshgrid(cp.zeta_nu_char_list, cp.check_xi_c_dot_list)
-            )
-
-            rate_dependent_zeta_nu_char_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit_list = (
-                np.asarray(rate_dependent_zeta_nu_char_overline_epsilon_cnu_diss_hat_crit___check_xi_c_dot_chunk_list)
-            )
-            
-            fig, ax1 = plt.subplots()
-
-            filled_contour_plot = ax1.contourf(
-                zeta_nu_char_list_meshgrid, check_xi_c_dot_list_meshgrid,
-                rate_dependent_zeta_nu_char_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit_list,
-                levels=overline_epsilon_cnu_diss_hat_crit_contourf_levels,
-                cmap=plt.cm.hsv)
-            
-            for fcp in filled_contour_plot.collections:
-                fcp.set_edgecolor('face')
-            
-            ax1.set_xlabel(r'$\zeta_{\nu}^{char}$', fontsize=30)
-            ax1.set_ylabel(r'$\check{\dot{\xi}}_c$', fontsize=30)
-            ax1.set_xscale('log')
-            ax1.set_yscale('log')
-            # ax1.tick_params(axis='both', labelsize=16)
-
-            labeled_contour_plot = ax1.contour(
-                zeta_nu_char_list_meshgrid, check_xi_c_dot_list_meshgrid,
-                rate_dependent_zeta_nu_char_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit_list,
-                levels=overline_epsilon_cnu_diss_hat_crit_contour_levels,
-                colors=('black',), linewidths=0.25)
-            ax1.clabel(
-                labeled_contour_plot, fmt='%3.2f',
-                colors='black',  fontsize=10)
-            
-            ax1.set_ylim(top=1e-3)
-
-            cbar = fig.colorbar(
-                filled_contour_plot,
-                ticks=overline_epsilon_cnu_diss_hat_crit_contourf_ticks)
-            cbar.ax.set_ylabel(
-                r'$\overline{(\hat{\varepsilon}_{c\nu}^{diss})^{crit}}$',
-                fontsize=30)
-            cbar.ax.tick_params(axis='y', labelsize=20)
-            
-            plt.yticks(fontsize=20)
-            plt.xticks(fontsize=20)
-            
-            save_current_figure_no_labels(
-                self.savedir,
-                "overline_epsilon_cnu_diss_hat_crit-filled-contour-check_xi_c_dot-vs-zeta_nu_char")
-            
-            zeta_nu_char_list_meshgrid, check_lmbda_c_eq_dot_list_meshgrid = (
-                np.meshgrid(cp.zeta_nu_char_list, cp.check_lmbda_c_eq_dot_list)
-            )
-
-            rate_dependent_zeta_nu_char_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit_list = (
-                np.asarray(rate_dependent_zeta_nu_char_overline_epsilon_cnu_diss_hat_crit___check_lmbda_c_eq_dot_chunk_list)
-            )
-            
-            fig, ax1 = plt.subplots()
-
-            filled_contour_plot = ax1.contourf(
-                zeta_nu_char_list_meshgrid, check_lmbda_c_eq_dot_list_meshgrid,
-                rate_dependent_zeta_nu_char_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit_list,
-                levels=overline_epsilon_cnu_diss_hat_crit_contourf_levels,
-                cmap=plt.cm.hsv)
-            
-            for fcp in filled_contour_plot.collections:
-                fcp.set_edgecolor('face')
-            
-            ax1.set_xlabel(r'$\zeta_{\nu}^{char}$', fontsize=30)
-            ax1.set_ylabel(r'$\check{\dot{\lambda}}_c^{eq}$', fontsize=30)
-            ax1.set_xscale('log')
-            ax1.set_yscale('log')
-            # ax1.tick_params(axis='both', labelsize=16)
-
-            labeled_contour_plot = ax1.contour(
-                zeta_nu_char_list_meshgrid, check_lmbda_c_eq_dot_list_meshgrid,
-                rate_dependent_zeta_nu_char_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit_list,
-                levels=overline_epsilon_cnu_diss_hat_crit_contour_levels,
-                colors=('black',), linewidths=0.25)
-            ax1.clabel(
-                labeled_contour_plot, fmt='%3.2f',
-                colors='black',  fontsize=10)
-            
-            ax1.set_ylim(top=1e-3)
-
-            cbar = fig.colorbar(
-                filled_contour_plot,
-                ticks=overline_epsilon_cnu_diss_hat_crit_contourf_ticks)
-            cbar.ax.set_ylabel(
-                r'$\overline{(\hat{\varepsilon}_{c\nu}^{diss})^{crit}}$',
-                fontsize=30)
-            cbar.ax.tick_params(axis='y', labelsize=20)
-            
-            plt.yticks(fontsize=20)
-            plt.xticks(fontsize=20)
-            
-            save_current_figure_no_labels(
-                self.savedir,
-                "overline_epsilon_cnu_diss_hat_crit-filled-contour-check_lmbda_c_eq_dot-vs-zeta_nu_char")
 
             overline_epsilon_cnu_diss_hat_crit_contourf_levels_num = 101
             overline_epsilon_cnu_diss_hat_crit_contourf_levels = np.linspace(
@@ -1444,25 +1229,61 @@ class FractureToughnessSweepCharacterizer(CompositeuFJCScissionCharacterizer):
             overline_epsilon_cnu_diss_hat_crit_contour_levels_num = 26
             overline_epsilon_cnu_diss_hat_crit_contour_levels = np.linspace(
                 0, 1, overline_epsilon_cnu_diss_hat_crit_contour_levels_num)
+            
+            colormap = plt.cm.hsv
+
 
             kappa_nu_list_meshgrid, check_xi_c_dot_list_meshgrid = np.meshgrid(
                 cp.kappa_nu_list, cp.check_xi_c_dot_list)
-
-            rate_dependent_kappa_nu_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit_list = (
-                np.asarray(rate_dependent_kappa_nu_overline_epsilon_cnu_diss_hat_crit___check_xi_c_dot_chunk_list)
+            
+            rate_dependent_kappa_nu_overline_epsilon_cnu_diss_hat_crit___check_xi_c_dot_chunk_arr = (
+                np.asarray(
+                    rate_dependent_kappa_nu_overline_epsilon_cnu_diss_hat_crit___check_xi_c_dot_chunk_list)
             )
-
-            rate_dependent_kappa_nu_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit_list_transpose = (
-                np.transpose(rate_dependent_kappa_nu_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit_list)
+            rate_dependent_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit___kappa_nu_chunk_arr = (
+                np.transpose(
+                    rate_dependent_kappa_nu_overline_epsilon_cnu_diss_hat_crit___check_xi_c_dot_chunk_arr)
             )
             
+            init_mask_indx_list = []
+
+            for kappa_nu_indx in range(cp.kappa_nu_num):
+                max_check_xi_c_dot_indx = np.argmax(
+                    rate_dependent_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit___kappa_nu_chunk_arr[kappa_nu_indx])
+                mask_indx = max_check_xi_c_dot_indx + 1
+                init_mask_indx_list.append(mask_indx)
+            
+            premasked_rate_dependent_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit___kappa_nu_chunk_arr = (
+                np.copy(
+                    rate_dependent_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit___kappa_nu_chunk_arr)
+            )
+
+            for kappa_nu_indx in range(cp.kappa_nu_num):
+                init_mask_indx = init_mask_indx_list[kappa_nu_indx]
+                for mask_indx in range(init_mask_indx, cp.check_xi_c_dot_num):
+                    premasked_rate_dependent_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit___kappa_nu_chunk_arr[kappa_nu_indx][mask_indx] = (
+                        np.nan
+                    )
+            
+            premasked_rate_dependent_kappa_nu_overline_epsilon_cnu_diss_hat_crit___check_xi_c_dot_chunk_arr = (
+                np.transpose(
+                    premasked_rate_dependent_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit___kappa_nu_chunk_arr)
+            )
+
+            masked_rate_dependent_kappa_nu_overline_epsilon_cnu_diss_hat_crit___check_xi_c_dot_chunk_arr = (
+                np.ma.masked_invalid(
+                    premasked_rate_dependent_kappa_nu_overline_epsilon_cnu_diss_hat_crit___check_xi_c_dot_chunk_arr)
+            )
+
             fig, ax1 = plt.subplots()
+
+            ax1.patch.set_facecolor('silver')
 
             filled_contour_plot = ax1.contourf(
                 kappa_nu_list_meshgrid, check_xi_c_dot_list_meshgrid,
-                rate_dependent_kappa_nu_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit_list,
+                masked_rate_dependent_kappa_nu_overline_epsilon_cnu_diss_hat_crit___check_xi_c_dot_chunk_arr,
                 levels=overline_epsilon_cnu_diss_hat_crit_contourf_levels,
-                cmap=plt.cm.hsv)
+                cmap=colormap)
             
             for fcp in filled_contour_plot.collections:
                 fcp.set_edgecolor('face')
@@ -1471,33 +1292,17 @@ class FractureToughnessSweepCharacterizer(CompositeuFJCScissionCharacterizer):
             ax1.set_ylabel(r'$\check{\dot{\xi}}_c$', fontsize=30)
             ax1.set_xscale('log')
             ax1.set_yscale('log')
+            ax1.set_yticks(np.logspace(-21, 3, 5))
             # ax1.tick_params(axis='both', labelsize=16)
 
             labeled_contour_plot = ax1.contour(
                 kappa_nu_list_meshgrid, check_xi_c_dot_list_meshgrid,
-                rate_dependent_kappa_nu_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit_list,
+                masked_rate_dependent_kappa_nu_overline_epsilon_cnu_diss_hat_crit___check_xi_c_dot_chunk_arr,
                 levels=overline_epsilon_cnu_diss_hat_crit_contour_levels,
                 colors=('black',), linewidths=0.25)
             ax1.clabel(
                 labeled_contour_plot, fmt='%3.2f',
                 colors='black',  fontsize=10)
-            
-            max_check_xi_c_dot_list = []
-
-            for kappa_nu_indx in range(cp.kappa_nu_num):
-                rate_dependent_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit_list = (
-                    rate_dependent_kappa_nu_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit_list_transpose[kappa_nu_indx]
-                )
-                max_check_xi_c_dot_indx = np.argmax(
-                    rate_dependent_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit_list)
-                max_check_xi_c_dot_val = (
-                    cp.check_xi_c_dot_list[max_check_xi_c_dot_indx]
-                )
-                max_check_xi_c_dot_list.append(max_check_xi_c_dot_val)
-            
-            ax1.plot(
-                cp.kappa_nu_list, max_check_xi_c_dot_list,
-                color='silver', linestyle='-', alpha=1, linewidth=5.0)
             
             cbar = fig.colorbar(
                 filled_contour_plot,
@@ -1509,30 +1314,65 @@ class FractureToughnessSweepCharacterizer(CompositeuFJCScissionCharacterizer):
             
             plt.yticks(fontsize=20)
             plt.xticks(fontsize=20)
+
+            plt.tight_layout()
+            fig.savefig(
+                self.savedir+"overline_epsilon_cnu_diss_hat_crit-filled-contour-check_xi_c_dot-vs-kappa_nu"+".pdf",
+                transparent=False)
+            plt.close()
+
+            kappa_nu_list_meshgrid, check_lmbda_c_eq_dot_list_meshgrid = np.meshgrid(
+                cp.kappa_nu_list, cp.check_lmbda_c_eq_dot_list)
             
-            save_current_figure_no_labels(
-                self.savedir,
-                "overline_epsilon_cnu_diss_hat_crit-filled-contour-check_xi_c_dot-vs-kappa_nu")
+            rate_dependent_kappa_nu_overline_epsilon_cnu_diss_hat_crit___check_lmbda_c_eq_dot_chunk_arr = (
+                np.asarray(
+                    rate_dependent_kappa_nu_overline_epsilon_cnu_diss_hat_crit___check_lmbda_c_eq_dot_chunk_list)
+            )
+            rate_dependent_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit___kappa_nu_chunk_arr = (
+                np.transpose(
+                    rate_dependent_kappa_nu_overline_epsilon_cnu_diss_hat_crit___check_lmbda_c_eq_dot_chunk_arr)
+            )
             
-            kappa_nu_list_meshgrid, check_lmbda_c_eq_dot_list_meshgrid = (
-                np.meshgrid(cp.kappa_nu_list, cp.check_lmbda_c_eq_dot_list)
+            init_mask_indx_list = []
+
+            for kappa_nu_indx in range(cp.kappa_nu_num):
+                max_check_lmbda_c_eq_dot_indx = np.argmax(
+                    rate_dependent_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit___kappa_nu_chunk_arr[kappa_nu_indx])
+                mask_indx = max_check_lmbda_c_eq_dot_indx + 1
+                init_mask_indx_list.append(mask_indx)
+            
+            premasked_rate_dependent_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit___kappa_nu_chunk_arr = (
+                np.copy(
+                    rate_dependent_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit___kappa_nu_chunk_arr)
             )
 
-            rate_dependent_kappa_nu_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit_list = (
-                np.asarray(rate_dependent_kappa_nu_overline_epsilon_cnu_diss_hat_crit___check_lmbda_c_eq_dot_chunk_list)
+            for kappa_nu_indx in range(cp.kappa_nu_num):
+                init_mask_indx = init_mask_indx_list[kappa_nu_indx]
+                for mask_indx \
+                    in range(init_mask_indx, cp.check_lmbda_c_eq_dot_num):
+                    premasked_rate_dependent_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit___kappa_nu_chunk_arr[kappa_nu_indx][mask_indx] = (
+                        np.nan
+                    )
+            
+            premasked_rate_dependent_kappa_nu_overline_epsilon_cnu_diss_hat_crit___check_lmbda_c_eq_dot_chunk_arr = (
+                np.transpose(
+                    premasked_rate_dependent_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit___kappa_nu_chunk_arr)
             )
 
-            rate_dependent_kappa_nu_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit_list_transpose = (
-                np.transpose(rate_dependent_kappa_nu_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit_list)
+            masked_rate_dependent_kappa_nu_overline_epsilon_cnu_diss_hat_crit___check_lmbda_c_eq_dot_chunk_arr = (
+                np.ma.masked_invalid(
+                    premasked_rate_dependent_kappa_nu_overline_epsilon_cnu_diss_hat_crit___check_lmbda_c_eq_dot_chunk_arr)
             )
-            
+
             fig, ax1 = plt.subplots()
+
+            ax1.patch.set_facecolor('silver')
 
             filled_contour_plot = ax1.contourf(
                 kappa_nu_list_meshgrid, check_lmbda_c_eq_dot_list_meshgrid,
-                rate_dependent_kappa_nu_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit_list,
+                masked_rate_dependent_kappa_nu_overline_epsilon_cnu_diss_hat_crit___check_lmbda_c_eq_dot_chunk_arr,
                 levels=overline_epsilon_cnu_diss_hat_crit_contourf_levels,
-                cmap=plt.cm.hsv)
+                cmap=colormap)
             
             for fcp in filled_contour_plot.collections:
                 fcp.set_edgecolor('face')
@@ -1541,33 +1381,18 @@ class FractureToughnessSweepCharacterizer(CompositeuFJCScissionCharacterizer):
             ax1.set_ylabel(r'$\check{\dot{\lambda}}_c^{eq}$', fontsize=30)
             ax1.set_xscale('log')
             ax1.set_yscale('log')
+            ax1.set_ylim(top=1)
+            ax1.set_yticks(np.logspace(-21, 0, 4))
             # ax1.tick_params(axis='both', labelsize=16)
 
             labeled_contour_plot = ax1.contour(
                 kappa_nu_list_meshgrid, check_lmbda_c_eq_dot_list_meshgrid,
-                rate_dependent_kappa_nu_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit_list,
+                masked_rate_dependent_kappa_nu_overline_epsilon_cnu_diss_hat_crit___check_lmbda_c_eq_dot_chunk_arr,
                 levels=overline_epsilon_cnu_diss_hat_crit_contour_levels,
                 colors=('black',), linewidths=0.25)
             ax1.clabel(
                 labeled_contour_plot, fmt='%3.2f',
                 colors='black',  fontsize=10)
-            
-            max_check_lmbda_c_eq_dot_list = []
-
-            for kappa_nu_indx in range(cp.kappa_nu_num):
-                rate_dependent_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit_list = (
-                    rate_dependent_kappa_nu_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit_list_transpose[kappa_nu_indx]
-                )
-                max_check_lmbda_c_eq_dot_indx = np.argmax(
-                    rate_dependent_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit_list)
-                max_check_lmbda_c_eq_dot_val = (
-                    cp.check_lmbda_c_eq_dot_list[max_check_lmbda_c_eq_dot_indx]
-                )
-                max_check_lmbda_c_eq_dot_list.append(max_check_lmbda_c_eq_dot_val)
-            
-            ax1.plot(
-                cp.kappa_nu_list, max_check_lmbda_c_eq_dot_list,
-                color='silver', linestyle='-', alpha=1, linewidth=5.0)
             
             cbar = fig.colorbar(
                 filled_contour_plot,
@@ -1579,65 +1404,83 @@ class FractureToughnessSweepCharacterizer(CompositeuFJCScissionCharacterizer):
             
             plt.yticks(fontsize=20)
             plt.xticks(fontsize=20)
+
+            plt.tight_layout()
+            fig.savefig(
+                self.savedir+"overline_epsilon_cnu_diss_hat_crit-filled-contour-check_lmbda_c_eq_dot-vs-kappa_nu"+".pdf",
+                transparent=False)
+            plt.close()
+
+            zeta_nu_char_list_meshgrid, check_xi_c_dot_list_meshgrid = np.meshgrid(
+                cp.zeta_nu_char_list, cp.check_xi_c_dot_list)
             
-            save_current_figure_no_labels(
-                self.savedir,
-                "overline_epsilon_cnu_diss_hat_crit-filled-contour-check_lmbda_c_eq_dot-vs-kappa_nu")
+            rate_dependent_zeta_nu_char_overline_epsilon_cnu_diss_hat_crit___check_xi_c_dot_chunk_arr = (
+                np.asarray(
+                    rate_dependent_zeta_nu_char_overline_epsilon_cnu_diss_hat_crit___check_xi_c_dot_chunk_list)
+            )
+            rate_dependent_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit___zeta_nu_char_chunk_arr = (
+                np.transpose(
+                    rate_dependent_zeta_nu_char_overline_epsilon_cnu_diss_hat_crit___check_xi_c_dot_chunk_arr)
+            )
             
-            zeta_nu_char_list_meshgrid, check_xi_c_dot_list_meshgrid = (
-                np.meshgrid(cp.zeta_nu_char_list, cp.check_xi_c_dot_list)
+            init_mask_indx_list = []
+
+            for zeta_nu_char_indx in range(cp.zeta_nu_char_num):
+                max_check_xi_c_dot_indx = np.argmax(
+                    rate_dependent_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit___zeta_nu_char_chunk_arr[zeta_nu_char_indx])
+                mask_indx = max_check_xi_c_dot_indx + 1
+                init_mask_indx_list.append(mask_indx)
+            
+            premasked_rate_dependent_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit___zeta_nu_char_chunk_arr = (
+                np.copy(
+                    rate_dependent_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit___zeta_nu_char_chunk_arr)
             )
 
-            rate_dependent_zeta_nu_char_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit_list = (
-                np.asarray(rate_dependent_zeta_nu_char_overline_epsilon_cnu_diss_hat_crit___check_xi_c_dot_chunk_list)
+            for zeta_nu_char_indx in range(cp.zeta_nu_char_num):
+                init_mask_indx = init_mask_indx_list[zeta_nu_char_indx]
+                for mask_indx in range(init_mask_indx, cp.check_xi_c_dot_num):
+                    premasked_rate_dependent_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit___zeta_nu_char_chunk_arr[zeta_nu_char_indx][mask_indx] = (
+                        np.nan
+                    )
+            
+            premasked_rate_dependent_zeta_nu_char_overline_epsilon_cnu_diss_hat_crit___check_xi_c_dot_chunk_arr = (
+                np.transpose(
+                    premasked_rate_dependent_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit___zeta_nu_char_chunk_arr)
             )
 
-            rate_dependent_zeta_nu_char_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit_list_transpose = (
-                np.transpose(rate_dependent_zeta_nu_char_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit_list)
+            masked_rate_dependent_zeta_nu_char_overline_epsilon_cnu_diss_hat_crit___check_xi_c_dot_chunk_arr = (
+                np.ma.masked_invalid(
+                    premasked_rate_dependent_zeta_nu_char_overline_epsilon_cnu_diss_hat_crit___check_xi_c_dot_chunk_arr)
             )
-            
+
             fig, ax1 = plt.subplots()
+
+            ax1.patch.set_facecolor('silver')
 
             filled_contour_plot = ax1.contourf(
                 zeta_nu_char_list_meshgrid, check_xi_c_dot_list_meshgrid,
-                rate_dependent_zeta_nu_char_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit_list,
+                masked_rate_dependent_zeta_nu_char_overline_epsilon_cnu_diss_hat_crit___check_xi_c_dot_chunk_arr,
                 levels=overline_epsilon_cnu_diss_hat_crit_contourf_levels,
-                cmap=plt.cm.hsv)
+                cmap=colormap)
             
             for fcp in filled_contour_plot.collections:
                 fcp.set_edgecolor('face')
             
-            ax1.set_xlabel(r'$\zeta_{\nu}^{char}$', fontsize=30)
+            ax1.set_xlabel(r'$\kappa_{\nu}$', fontsize=30)
             ax1.set_ylabel(r'$\check{\dot{\xi}}_c$', fontsize=30)
             ax1.set_xscale('log')
             ax1.set_yscale('log')
+            ax1.set_yticks(np.logspace(-21, 3, 5))
             # ax1.tick_params(axis='both', labelsize=16)
 
             labeled_contour_plot = ax1.contour(
                 zeta_nu_char_list_meshgrid, check_xi_c_dot_list_meshgrid,
-                rate_dependent_zeta_nu_char_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit_list,
+                masked_rate_dependent_zeta_nu_char_overline_epsilon_cnu_diss_hat_crit___check_xi_c_dot_chunk_arr,
                 levels=overline_epsilon_cnu_diss_hat_crit_contour_levels,
                 colors=('black',), linewidths=0.25)
             ax1.clabel(
                 labeled_contour_plot, fmt='%3.2f',
                 colors='black',  fontsize=10)
-            
-            max_check_xi_c_dot_list = []
-            
-            for zeta_nu_char_indx in range(cp.zeta_nu_char_num):
-                rate_dependent_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit_list = (
-                    rate_dependent_zeta_nu_char_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit_list_transpose[zeta_nu_char_indx]
-                )
-                max_check_xi_c_dot_indx = np.argmax(
-                    rate_dependent_check_xi_c_dot_overline_epsilon_cnu_diss_hat_crit_list)
-                max_check_xi_c_dot_val = (
-                    cp.check_xi_c_dot_list[max_check_xi_c_dot_indx]
-                )
-                max_check_xi_c_dot_list.append(max_check_xi_c_dot_val)
-            
-            ax1.plot(
-                cp.zeta_nu_char_list, max_check_xi_c_dot_list,
-                color='silver', linestyle='-', alpha=1, linewidth=5.0)
             
             cbar = fig.colorbar(
                 filled_contour_plot,
@@ -1649,65 +1492,85 @@ class FractureToughnessSweepCharacterizer(CompositeuFJCScissionCharacterizer):
             
             plt.yticks(fontsize=20)
             plt.xticks(fontsize=20)
+
+            plt.tight_layout()
+            fig.savefig(
+                self.savedir+"overline_epsilon_cnu_diss_hat_crit-filled-contour-check_xi_c_dot-vs-zeta_nu_char"+".pdf",
+                transparent=False)
+            plt.close()
+
+            zeta_nu_char_list_meshgrid, check_lmbda_c_eq_dot_list_meshgrid = np.meshgrid(
+                cp.zeta_nu_char_list, cp.check_lmbda_c_eq_dot_list)
             
-            save_current_figure_no_labels(
-                self.savedir,
-                "overline_epsilon_cnu_diss_hat_crit-filled-contour-check_xi_c_dot-vs-zeta_nu_char")
+            rate_dependent_zeta_nu_char_overline_epsilon_cnu_diss_hat_crit___check_lmbda_c_eq_dot_chunk_arr = (
+                np.asarray(
+                    rate_dependent_zeta_nu_char_overline_epsilon_cnu_diss_hat_crit___check_lmbda_c_eq_dot_chunk_list)
+            )
+            rate_dependent_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit___zeta_nu_char_chunk_arr = (
+                np.transpose(
+                    rate_dependent_zeta_nu_char_overline_epsilon_cnu_diss_hat_crit___check_lmbda_c_eq_dot_chunk_arr)
+            )
             
-            zeta_nu_char_list_meshgrid, check_lmbda_c_eq_dot_list_meshgrid = (
-                np.meshgrid(cp.zeta_nu_char_list, cp.check_lmbda_c_eq_dot_list)
+            init_mask_indx_list = []
+
+            for zeta_nu_char_indx in range(cp.zeta_nu_char_num):
+                max_check_lmbda_c_eq_dot_indx = np.argmax(
+                    rate_dependent_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit___zeta_nu_char_chunk_arr[zeta_nu_char_indx])
+                mask_indx = max_check_lmbda_c_eq_dot_indx + 1
+                init_mask_indx_list.append(mask_indx)
+            
+            premasked_rate_dependent_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit___zeta_nu_char_chunk_arr = (
+                np.copy(
+                    rate_dependent_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit___zeta_nu_char_chunk_arr)
             )
 
-            rate_dependent_zeta_nu_char_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit_list = (
-                np.asarray(rate_dependent_zeta_nu_char_overline_epsilon_cnu_diss_hat_crit___check_lmbda_c_eq_dot_chunk_list)
+            for zeta_nu_char_indx in range(cp.zeta_nu_char_num):
+                init_mask_indx = init_mask_indx_list[zeta_nu_char_indx]
+                for mask_indx \
+                    in range(init_mask_indx, cp.check_lmbda_c_eq_dot_num):
+                    premasked_rate_dependent_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit___zeta_nu_char_chunk_arr[zeta_nu_char_indx][mask_indx] = (
+                        np.nan
+                    )
+            
+            premasked_rate_dependent_zeta_nu_char_overline_epsilon_cnu_diss_hat_crit___check_lmbda_c_eq_dot_chunk_arr = (
+                np.transpose(
+                    premasked_rate_dependent_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit___zeta_nu_char_chunk_arr)
             )
 
-            rate_dependent_zeta_nu_char_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit_list_transpose = (
-                np.transpose(rate_dependent_zeta_nu_char_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit_list)
+            masked_rate_dependent_zeta_nu_char_overline_epsilon_cnu_diss_hat_crit___check_lmbda_c_eq_dot_chunk_arr = (
+                np.ma.masked_invalid(
+                    premasked_rate_dependent_zeta_nu_char_overline_epsilon_cnu_diss_hat_crit___check_lmbda_c_eq_dot_chunk_arr)
             )
-            
+
             fig, ax1 = plt.subplots()
+
+            ax1.patch.set_facecolor('silver')
 
             filled_contour_plot = ax1.contourf(
                 zeta_nu_char_list_meshgrid, check_lmbda_c_eq_dot_list_meshgrid,
-                rate_dependent_zeta_nu_char_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit_list,
+                masked_rate_dependent_zeta_nu_char_overline_epsilon_cnu_diss_hat_crit___check_lmbda_c_eq_dot_chunk_arr,
                 levels=overline_epsilon_cnu_diss_hat_crit_contourf_levels,
-                cmap=plt.cm.hsv)
+                cmap=colormap)
             
             for fcp in filled_contour_plot.collections:
                 fcp.set_edgecolor('face')
             
-            ax1.set_xlabel(r'$\zeta_{\nu}^{char}$', fontsize=30)
+            ax1.set_xlabel(r'$\kappa_{\nu}$', fontsize=30)
             ax1.set_ylabel(r'$\check{\dot{\lambda}}_c^{eq}$', fontsize=30)
             ax1.set_xscale('log')
             ax1.set_yscale('log')
+            ax1.set_ylim(top=1)
+            ax1.set_yticks(np.logspace(-21, 0, 4))
             # ax1.tick_params(axis='both', labelsize=16)
 
             labeled_contour_plot = ax1.contour(
                 zeta_nu_char_list_meshgrid, check_lmbda_c_eq_dot_list_meshgrid,
-                rate_dependent_zeta_nu_char_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit_list,
+                masked_rate_dependent_zeta_nu_char_overline_epsilon_cnu_diss_hat_crit___check_lmbda_c_eq_dot_chunk_arr,
                 levels=overline_epsilon_cnu_diss_hat_crit_contour_levels,
                 colors=('black',), linewidths=0.25)
             ax1.clabel(
                 labeled_contour_plot, fmt='%3.2f',
                 colors='black',  fontsize=10)
-            
-            max_check_lmbda_c_eq_dot_list = []
-            
-            for zeta_nu_char_indx in range(cp.zeta_nu_char_num):
-                rate_dependent_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit_list = (
-                    rate_dependent_zeta_nu_char_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit_list_transpose[zeta_nu_char_indx]
-                )
-                max_check_lmbda_c_eq_dot_indx = np.argmax(
-                    rate_dependent_check_lmbda_c_eq_dot_overline_epsilon_cnu_diss_hat_crit_list)
-                max_check_lmbda_c_eq_dot_val = (
-                    cp.check_lmbda_c_eq_dot_list[max_check_lmbda_c_eq_dot_indx]
-                )
-                max_check_lmbda_c_eq_dot_list.append(max_check_lmbda_c_eq_dot_val)
-            
-            ax1.plot(
-                cp.zeta_nu_char_list, max_check_lmbda_c_eq_dot_list,
-                color='silver', linestyle='-', alpha=1, linewidth=5.0)
             
             cbar = fig.colorbar(
                 filled_contour_plot,
@@ -1719,10 +1582,12 @@ class FractureToughnessSweepCharacterizer(CompositeuFJCScissionCharacterizer):
             
             plt.yticks(fontsize=20)
             plt.xticks(fontsize=20)
-            
-            save_current_figure_no_labels(
-                self.savedir,
-                "overline_epsilon_cnu_diss_hat_crit-filled-contour-check_lmbda_c_eq_dot-vs-zeta_nu_char")
+
+            plt.tight_layout()
+            fig.savefig(
+                self.savedir+"overline_epsilon_cnu_diss_hat_crit-filled-contour-check_lmbda_c_eq_dot-vs-zeta_nu_char"+".pdf",
+                transparent=False)
+            plt.close()
 
 
 if __name__ == '__main__':
